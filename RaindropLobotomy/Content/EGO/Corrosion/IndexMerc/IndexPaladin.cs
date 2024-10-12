@@ -2,7 +2,8 @@ using System;
 using System.Runtime.CompilerServices;
 using Survariants;
 
-namespace RaindropLobotomy.EGO.Merc {
+namespace RaindropLobotomy.EGO.Merc
+{
     public class IndexPaladin : CorrosionBase<IndexPaladin>
     {
         public override string EGODisplayName => "Index Messenger Paladin";
@@ -36,7 +37,8 @@ namespace RaindropLobotomy.EGO.Merc {
         }
 
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-        public void SetupPaladinVariant() {
+        public void SetupPaladinVariant()
+        {
 
             _bodyPrefab = PrefabAPI.InstantiateClone(PaladinMod.PaladinPlugin.characterPrefab, "IndexPaladinBody");
             _displayPrefab = PrefabAPI.InstantiateClone(PaladinMod.Modules.Prefabs.paladinDisplayPrefab, "IndexPaladinDisplay");
@@ -46,7 +48,7 @@ namespace RaindropLobotomy.EGO.Merc {
 
             _bodyPrefab.AddComponent<IndexMerc.IndexPrescriptTargeter>();
             _bodyPrefab.AddComponent<IndexMerc.IndexLockTargeter>();
-            
+
             EGO = ScriptableObject.CreateInstance<SurvivorVariantDef>();
             (EGO as ScriptableObject).name = EGODisplayName;
             EGO.DisplayName = EGODisplayName;
@@ -87,7 +89,8 @@ namespace RaindropLobotomy.EGO.Merc {
             // replace spawn vfx
             // fix the sword using the emissive at some parts
 
-            void ModifyModel(GameObject target) {
+            void ModifyModel(GameObject target)
+            {
                 CharacterModel model = target.GetComponentInChildren<CharacterModel>();
                 model.RemoveComponent<ModelSkinController>();
                 model.baseRendererInfos = new CharacterModel.RendererInfo[] {

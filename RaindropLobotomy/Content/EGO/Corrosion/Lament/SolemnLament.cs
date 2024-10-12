@@ -1,6 +1,7 @@
 using System;
 
-namespace RaindropLobotomy.EGO.Commando {
+namespace RaindropLobotomy.EGO.Commando
+{
     public class SolemnLament : CorrosionBase<SolemnLament>
     {
         public override string EGODisplayName => "Solemn Lament";

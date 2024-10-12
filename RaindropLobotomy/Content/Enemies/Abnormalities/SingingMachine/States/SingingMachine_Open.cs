@@ -1,7 +1,9 @@
 using System;
 
-namespace RaindropLobotomy.Enemies.SingingMachine {
-    public class SingingMachine_Open : BaseState {
+namespace RaindropLobotomy.Enemies.SingingMachine
+{
+    public class SingingMachine_Open : BaseState
+    {
         public override void OnEnter()
         {
             base.OnEnter();

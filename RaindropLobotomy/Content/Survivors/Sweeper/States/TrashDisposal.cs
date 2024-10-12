@@ -1,6 +1,7 @@
 using System;
 
-namespace RaindropLobotomy.Survivors.Sweeper {
+namespace RaindropLobotomy.Survivors.Sweeper
+{
     public class TrashDisposal : CoolerBasicMeleeAttack
     {
         public override float BaseDuration => 1f;
@@ -29,7 +30,7 @@ namespace RaindropLobotomy.Survivors.Sweeper {
             PlayAnimation("Gesture, Override", "Slam", "Generic.playbackRate", duration);
 
             // AkSoundEngine.PostEvent(Events.Play_loader_R_variant_whooshDown, base.gameObject);
-            
+
             characterMotor.velocity = characterMotor.velocity.Nullify(true, false, true);
         }
 
@@ -39,17 +40,20 @@ namespace RaindropLobotomy.Survivors.Sweeper {
 
             // Debug.Log(animator.GetFloat("slamContact"));
 
-            if (!base.isGrounded && animator.GetFloat("slamBegun") > 0.5f) {
+            if (!base.isGrounded && animator.GetFloat("slamBegun") > 0.5f)
+            {
                 animator.SetFloat("Slam.playbackRate", 0f);
                 canExit = false;
                 base.fixedAge -= Time.fixedDeltaTime;
             }
-            else {
+            else
+            {
                 animator.SetFloat("Slam.playbackRate", 1f);
                 canExit = true;
             }
 
-            if (animator.GetFloat("slamContact") > 0.5f && !hasSlammed) {
+            if (animator.GetFloat("slamContact") > 0.5f && !hasSlammed)
+            {
                 hasSlammed = true;
 
                 Vector3 pos = modelLocator.modelTransform.position + (characterDirection.forward * 2.23f);
@@ -70,7 +74,8 @@ namespace RaindropLobotomy.Survivors.Sweeper {
                 attack.aimVector = Vector3.Reflect((pos - characterBody.corePosition).normalized, Vector3.up);
                 EffectManager.SimpleEffect(Sweeper.AcidSprayEffect, pos, Quaternion.LookRotation(characterDirection.forward, attack.aimVector), false);
                 attack.isCrit = base.RollCrit();
-                if (base.isAuthority) {
+                if (base.isAuthority)
+                {
                     attack.Fire();
                     attack.aimVector = base.characterDirection.forward;
                     attack.Fire();

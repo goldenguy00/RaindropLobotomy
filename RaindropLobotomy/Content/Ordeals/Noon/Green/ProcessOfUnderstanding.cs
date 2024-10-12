@@ -1,7 +1,8 @@
 using System;
 using RaindropLobotomy.Enemies;
 
-namespace RaindropLobotomy.Ordeals.Noon.Green {
+namespace RaindropLobotomy.Ordeals.Noon.Green
+{
     public class ProcessOfUnderstanding : EnemyBase<ProcessOfUnderstanding>
     {
         public LazyIndex noon = new("GreenNoonBody");
@@ -15,22 +16,29 @@ namespace RaindropLobotomy.Ordeals.Noon.Green {
             prefabMaster = Load<GameObject>("GreenNoonMaster.prefab");
 
             prefab.GetComponent<CharacterBody>().preferredPodPrefab = Paths.GameObject.RoboCratePod;
+            Chaingun.tracer = Paths.GameObject.TracerCommandoBoost;
+            Chaingun.hitEffect = Paths.GameObject.OmniImpactVFX;
+            Chaingun.flash = Paths.GameObject.MuzzleflashBarrage;
 
             RegisterEnemy(prefab, prefabMaster);
 
             LanguageAPI.Add("RL_UNDERSTANDING_NAME", "Process Of Understanding");
             LanguageAPI.Add("RL_UNDERSTANDING_SUB", "Ordeal of Green Noon");
 
-            On.RoR2.DamageInfo.ModifyDamageInfo += (orig, self, modifier) => {
+            On.RoR2.DamageInfo.ModifyDamageInfo += (orig, self, modifier) =>
+            {
                 orig(self, modifier);
 
-                if (modifier == HurtBox.DamageModifier.Barrier) {
+                if (modifier == HurtBox.DamageModifier.Barrier)
+                {
                     self.AddModdedDamageType(NoonInvulnFrontal);
                 }
             };
 
-            On.RoR2.HealthComponent.TakeDamageProcess += (orig, self, info) => {
-                if (self.body.bodyIndex == noon && info.HasModdedDamageType(NoonInvulnFrontal)) {
+            On.RoR2.HealthComponent.TakeDamageProcess += (orig, self, info) =>
+            {
+                if (self.body.bodyIndex == noon && info.HasModdedDamageType(NoonInvulnFrontal))
+                {
                     info.rejected = true;
 
                     EffectManager.SpawnEffect(RoR2.HealthComponent.AssetReferences.damageRejectedPrefab, new EffectData
@@ -42,7 +50,8 @@ namespace RaindropLobotomy.Ordeals.Noon.Green {
                 orig(self, info);
             };
 
-            On.EntityStates.BasicMeleeAttack.AuthorityTriggerHitPause += (orig, self) => {
+            On.EntityStates.BasicMeleeAttack.AuthorityTriggerHitPause += (orig, self) =>
+            {
                 if (self.GetType() == typeof(Saw)) return;
 
                 orig(self);

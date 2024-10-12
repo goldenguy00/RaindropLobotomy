@@ -1,9 +1,10 @@
 using System;
 
-namespace RaindropLobotomy.Buffs {
+namespace RaindropLobotomy.Buffs
+{
     public class Fairy : BuffBase<Fairy>
     {
-        public override BuffDef Buff => Load<BuffDef>("bdFairy.asset");
+        public override BuffDef Buff { get; set; } = Load<BuffDef>("bdFairy.asset");
         public static float DamageCoeffToDetonate = 5f;
         public static DamageAPI.ModdedDamageType FairyOnHit = DamageAPI.ReserveDamageType();
         public static DamageAPI.ModdedDamageType TripleFairyOnHit = DamageAPI.ReserveDamageType();
@@ -15,10 +16,12 @@ namespace RaindropLobotomy.Buffs {
 
         private void UpdateFairy(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, GlobalEventManager self, DamageInfo info, GameObject victim)
         {
-            if (info.attacker) {
+            if (info.attacker)
+            {
                 CharacterBody body = info.attacker.GetComponent<CharacterBody>();
 
-                if (body && body.HasBuff(Buff) && info.procChainMask.mask == 0) {
+                if (body && body.HasBuff(Buff) && info.procChainMask.mask == 0)
+                {
                     FairyDamageController controller = body.GetComponent<FairyDamageController>();
 
                     if (controller) controller.AcculumatedBaseDamage += info.damage / body.damage;
@@ -27,17 +30,21 @@ namespace RaindropLobotomy.Buffs {
 
             orig(self, info, victim);
 
-            if ((info.HasModdedDamageType(FairyOnHit) || info.HasModdedDamageType(TripleFairyOnHit)) && victim) {
+            if ((info.HasModdedDamageType(FairyOnHit) || info.HasModdedDamageType(TripleFairyOnHit)) && victim)
+            {
                 CharacterBody body = victim.GetComponent<CharacterBody>();
 
-                if (body) {
+                if (body)
+                {
                     int count = info.HasModdedDamageType(TripleFairyOnHit) ? 3 : 1;
 
-                    for (int i = 0; i < count; i++) {
+                    for (int i = 0; i < count; i++)
+                    {
                         body.AddTimedBuff(Buff, 10f);
                     }
 
-                    if (!body.GetComponent<FairyDamageController>()) {
+                    if (!body.GetComponent<FairyDamageController>())
+                    {
                         FairyDamageController fairyController = body.AddComponent<FairyDamageController>();
                         fairyController.body = body;
                     }
@@ -46,17 +53,21 @@ namespace RaindropLobotomy.Buffs {
         }
     }
 
-    public class FairyDamageController : MonoBehaviour {
+    public class FairyDamageController : MonoBehaviour
+    {
         public float AcculumatedBaseDamage = 0f;
         public CharacterBody body;
 
-        public void FixedUpdate() {
-            if (!body.HasBuff(Fairy.Instance.Buff)) {
+        public void FixedUpdate()
+        {
+            if (!body.HasBuff(Fairy.Instance.Buff))
+            {
                 Destroy(this);
                 return;
             }
 
-            if (AcculumatedBaseDamage >= Fairy.DamageCoeffToDetonate) {
+            if (AcculumatedBaseDamage >= Fairy.DamageCoeffToDetonate)
+            {
                 int times = Mathf.FloorToInt(AcculumatedBaseDamage / Fairy.DamageCoeffToDetonate);
                 AcculumatedBaseDamage = 0f;
 
@@ -64,7 +75,8 @@ namespace RaindropLobotomy.Buffs {
             }
         }
 
-        public void DetonateFairyStacks(int times) {
+        public void DetonateFairyStacks(int times)
+        {
             int fairyStacks = body.GetBuffCount(Fairy.Instance.Buff);
 
             DamageInfo damage = new();
@@ -74,7 +86,7 @@ namespace RaindropLobotomy.Buffs {
             damage.damage = body.damage * fairyStacks * times;
             damage.damageColorIndex = DamageColorIndex.Fragile;
             damage.position = body.corePosition;
-            
+
             body.healthComponent.TakeDamage(damage);
 
             GameObject effect = GameObject.Instantiate(Enemies.ArbiterBoss.ArbiterBoss.FairyTracerSlashEffect, body.corePosition, Quaternion.LookRotation(Random.onUnitSphere));

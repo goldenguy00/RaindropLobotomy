@@ -12,8 +12,10 @@ using RoR2.CharacterAI;
 using System.Collections;
 using RaindropLobotomy.Buffs;
 
-namespace RaindropLobotomy.Enemies.ArbiterBoss {
-    public class CastFairy : BaseSkillState {
+namespace RaindropLobotomy.Enemies.ArbiterBoss
+{
+    public class CastFairy : BaseSkillState
+    {
         public static string MuzzleName = "MuzzleHand";
         public static float DamageCoefficient = 4f;
         public static GameObject Flash => ArbiterBoss.FairyMuzzleFlash;
@@ -26,7 +28,7 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
         public override void OnEnter()
         {
             base.OnEnter();
-    
+
             // Debug.Log("playing fairy anim");
             PlayAnimation("Gesture, Override", "CastFairy", "CastFairy.playbackRate", 0.7f);
 
@@ -60,17 +62,19 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
             base.FixedUpdate();
 
             characterMotor.moveDirection = Vector3.zero;
-            
+
             characterBody.SetAimTimer(0.5f);
 
             base.characterBody.SetAimTimer(0.4f);
 
-            if (base.fixedAge >= 0.5f && !fired) {
+            if (base.fixedAge >= 0.5f && !fired)
+            {
                 Ray lrRay = base.GetAimRay();
 
                 AkSoundEngine.PostEvent(Events.Play_MULT_m1_snipe_shoot, base.gameObject);
 
-                for (float i = 3f; i < (Vector3.Distance(lrRay.origin, lrRay.GetPoint(70))); i += 5f) {
+                for (float i = 3f; i < (Vector3.Distance(lrRay.origin, lrRay.GetPoint(70))); i += 5f)
+                {
                     Vector3 pos = lrRay.origin + (lrRay.direction * i);
                     GameObject.Instantiate(ArbiterBoss.FairyTracerSlashEffect, pos, Quaternion.LookRotation(Random.onUnitSphere));
                 }
@@ -94,7 +98,8 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
                 fired = true;
             }
 
-            if (base.fixedAge >= 1.2f) {
+            if (base.fixedAge >= 1.2f)
+            {
                 outer.SetNextStateToMain();
             }
         }

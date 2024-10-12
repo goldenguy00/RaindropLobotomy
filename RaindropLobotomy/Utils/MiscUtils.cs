@@ -18,7 +18,8 @@ namespace RaindropLobotomy.Utils
             return null;
         }
 
-        public static Vector3? GroundPoint(this Vector3 point) {
+        public static Vector3? GroundPoint(this Vector3 point)
+        {
             return RaycastToDirection(point, float.PositiveInfinity, Vector3.down, LayerIndex.world.mask);
         }
 
@@ -31,7 +32,7 @@ namespace RaindropLobotomy.Utils
         /// <returns>The shuffled collection.</returns>
         public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> toShuffle, Xoroshiro128Plus random)
         {
-            List<T> shuffled = new List<T>();
+            List<T> shuffled = [];
             foreach (T value in toShuffle)
             {
                 shuffled.Insert(random.RangeInt(0, shuffled.Count + 1), value);
@@ -188,7 +189,7 @@ namespace RaindropLobotomy.Utils
         /// <returns>The dictionary containing the alignment information based on the normal the raycast hit, else if it hit nothing it returns null.</returns>
         public static Dictionary<string, Vector3> GetAimSurfaceAlignmentInfo(Ray ray, int layerMask, float distance)
         {
-            Dictionary<string, Vector3> SurfaceAlignmentInfo = new Dictionary<string, Vector3>();
+            Dictionary<string, Vector3> SurfaceAlignmentInfo = [];
 
             var didHit = Physics.Raycast(ray, out RaycastHit raycastHit, distance, layerMask, QueryTriggerInteraction.Ignore);
 
@@ -215,65 +216,82 @@ namespace RaindropLobotomy.Utils
         ///<param name="center">the center position</param>
         ///<param name="distance">the max distance</param>
         ///<returns>the list of positions</returns>
-        public static Vector3[] GetSafePositionsWithinDistance(Vector3 center, float distance) {
-            if (SceneInfo.instance && SceneInfo.instance.groundNodes) {
+        public static Vector3[] GetSafePositionsWithinDistance(Vector3 center, float distance)
+        {
+            if (SceneInfo.instance && SceneInfo.instance.groundNodes)
+            {
                 NodeGraph graph = SceneInfo.instance.groundNodes;
-                List<Vector3> valid = new();
-                foreach (NodeGraph.Node node in graph.nodes) {
-                    if (Vector3.Distance(node.position, center) <= distance) {
+                List<Vector3> valid = [];
+                foreach (NodeGraph.Node node in graph.nodes)
+                {
+                    if (Vector3.Distance(node.position, center) <= distance)
+                    {
                         valid.Add(node.position);
                     }
                 }
                 return valid.ToArray();
             }
-            else {
+            else
+            {
                 return new Vector3[] { center };
             }
         }
 
-        public static Vector3 GetRandomGroundNode(NodeFlags reqFlags, NodeFlags forbiddenFlags, HullMask hull) {
-            if (SceneInfo.instance && SceneInfo.instance.groundNodes) {
+        public static Vector3 GetRandomGroundNode(NodeFlags reqFlags, NodeFlags forbiddenFlags, HullMask hull)
+        {
+            if (SceneInfo.instance && SceneInfo.instance.groundNodes)
+            {
                 NodeGraph graph = SceneInfo.instance.groundNodes;
 
-                List<Vector3> valid = new();
+                List<Vector3> valid = [];
 
-                foreach (NodeGraph.Node node in graph.nodes) {
+                foreach (NodeGraph.Node node in graph.nodes)
+                {
                     if (
                         (node.forbiddenHulls & hull) == 0 &&
                         (node.flags & reqFlags) == reqFlags &&
                         (node.flags & forbiddenFlags) == 0
-                    ) {
+                    )
+                    {
                         valid.Add(node.position);
                     }
                 }
 
-                if (valid.Count > 0) {
+                if (valid.Count > 0)
+                {
                     return valid.GetRandom();
                 }
-                else {
+                else
+                {
                     return Random.onUnitSphere * 500f;
                 }
             }
-            else {
+            else
+            {
                 return Random.onUnitSphere * 500f;
             }
         }
 
-        public static AnimatorOverrideController FixOverrideController(RuntimeAnimatorController target, AnimatorOverrideController original) {
+        public static AnimatorOverrideController FixOverrideController(RuntimeAnimatorController target, AnimatorOverrideController original)
+        {
             AnimatorOverrideController controller = new(target);
 
-            foreach (AnimationClip clip in original.animationClips) {
+            foreach (AnimationClip clip in original.animationClips)
+            {
                 Debug.Log(clip.name + " - clip");
             }
 
             return controller;
         }
 
-        public static HurtBox[] RetrieveNearbyTargets(CharacterBody owner, float radius) {
-            SphereSearch search = new();
-            search.origin = owner.corePosition;
-            search.radius = radius;
-            search.mask = LayerIndex.entityPrecise.mask;
+        public static HurtBox[] RetrieveNearbyTargets(CharacterBody owner, float radius)
+        {
+            SphereSearch search = new()
+            {
+                origin = owner.corePosition,
+                radius = radius,
+                mask = LayerIndex.entityPrecise.mask
+            };
             search.RefreshCandidates();
             search.FilterCandidatesByHurtBoxTeam(TeamMask.GetUnprotectedTeams(owner.teamComponent.teamIndex));
             search.FilterCandidatesByDistinctHurtBoxEntities();
@@ -282,7 +300,8 @@ namespace RaindropLobotomy.Utils
         }
     }
 
-    public class Timer {
+    public class Timer
+    {
         public float duration;
         public float cur;
         private bool inv;
@@ -291,7 +310,8 @@ namespace RaindropLobotomy.Utils
         private bool trueIfExp;
         private bool resetOnExp;
 
-        public Timer(float dur, bool inverse = false, bool expires = false, bool trueOnExpire = false, bool resetOnExpire = false) {
+        public Timer(float dur, bool inverse = false, bool expires = false, bool trueOnExpire = false, bool resetOnExpire = false)
+        {
             duration = dur;
             inv = inverse;
             trueIfExp = trueOnExpire;
@@ -301,15 +321,18 @@ namespace RaindropLobotomy.Utils
         }
 
         public void Reset() => cur = inv ? duration : 0f;
-        public bool Tick() {
+        public bool Tick()
+        {
             cur += inv ? -Time.fixedDeltaTime : Time.fixedDeltaTime;
 
             bool res = inv ? cur <= 0f : cur >= duration;
 
-            if (expires) {
+            if (expires)
+            {
                 if (expired && !resetOnExp) return trueIfExp;
                 expired = res;
-                if (resetOnExp && expired) {
+                if (resetOnExp && expired)
+                {
                     expired = false;
                     Reset();
                     // Debug.Log("resetting");
@@ -320,23 +343,27 @@ namespace RaindropLobotomy.Utils
         }
     }
 
-    public class LazyIndex {
+    public class LazyIndex
+    {
         private string target;
         private BodyIndex _value = BodyIndex.None;
         public BodyIndex Value => UpdateValue();
 
-        public LazyIndex(string target) {
+        public LazyIndex(string target)
+        {
             this.target = target;
         }
 
-        public BodyIndex UpdateValue() {
-            if (_value == BodyIndex.None || _value == (BodyIndex)(-1)) {
+        public BodyIndex UpdateValue()
+        {
+            if (_value == BodyIndex.None || _value == (BodyIndex)(-1))
+            {
                 _value = BodyCatalog.FindBodyIndex(target);
             }
 
             return _value;
         }
 
-        public static implicit operator BodyIndex(LazyIndex index) => index.Value; 
+        public static implicit operator BodyIndex(LazyIndex index) => index.Value;
     }
 }

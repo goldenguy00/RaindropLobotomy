@@ -1,7 +1,9 @@
 using System;
 
-namespace RaindropLobotomy.Survivors.Sweeper {
-    public class RallyAllies : BaseSkillState {
+namespace RaindropLobotomy.Survivors.Sweeper
+{
+    public class RallyAllies : BaseSkillState
+    {
         public float duration = 1.45f;
         public float radius = 45f;
         public bool rallied = false;
@@ -20,21 +22,26 @@ namespace RaindropLobotomy.Survivors.Sweeper {
 
             base.characterMotor.velocity = base.characterMotor.velocity.Nullify(true, false, true);
 
-            if (base.fixedAge >= duration) {
+            if (base.fixedAge >= duration)
+            {
                 outer.SetNextStateToMain();
             }
 
-            if (!rallied && animator.GetFloat("rallyBegun") > 0.5f && NetworkServer.active) {
+            if (!rallied && animator.GetFloat("rallyBegun") > 0.5f && NetworkServer.active)
+            {
                 rallied = true;
                 Rally();
             }
         }
 
-        public void Rally() {
+        public void Rally()
+        {
             List<CharacterBody> bodies = Sweeper.GetSweepersInRange(radius, base.transform.position);
 
-            for (int i = 0; i < bodies.Count; i++) {
-                for (int j = 0; j < bodies.Count; j++) {
+            for (int i = 0; i < bodies.Count; i++)
+            {
+                for (int j = 0; j < bodies.Count; j++)
+                {
                     bodies[i].AddTimedBuff(Buffs.Persistence.Instance.Buff, 10f);
                 }
             }

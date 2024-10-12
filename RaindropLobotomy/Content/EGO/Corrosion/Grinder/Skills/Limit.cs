@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using System.Linq;
 
-namespace RaindropLobotomy.EGO.Toolbot {
-    public class Limit : BaseSkillState {
+namespace RaindropLobotomy.EGO.Toolbot
+{
+    public class Limit : BaseSkillState
+    {
         public float DamageCoefficient = 8f;
         public int DashCount = 3;
         public string MuzzleName = "MuzzleCleanup";
@@ -25,7 +27,7 @@ namespace RaindropLobotomy.EGO.Toolbot {
         public override void OnEnter()
         {
             base.OnEnter();
-            
+
             attack = new();
             attack.damage = base.damageStat * DamageCoefficient;
             attack.attacker = base.gameObject;
@@ -38,7 +40,8 @@ namespace RaindropLobotomy.EGO.Toolbot {
 
             UpdateBoxes();
 
-            if (line.Count <= 0f) {
+            if (line.Count <= 0f)
+            {
                 outer.SetNextStateToMain();
                 return;
             }
@@ -52,14 +55,15 @@ namespace RaindropLobotomy.EGO.Toolbot {
 
             FindModelChild("LimitTrail").gameObject.SetActive(true);
 
-            handle = base.GetComponent<CameraTargetParams>().AddParamsOverride(new() {
+            handle = base.GetComponent<CameraTargetParams>().AddParamsOverride(new()
+            {
                 cameraParamsData = Paths.CharacterCameraParams.ccpStandardTall.data,
             }, 1f);
 
             Grinder.DecreaseCharge(base.characterBody, 10);
 
             base.characterMotor._gravityParameters.channeledAntiGravityGranterCount++;
-            
+
             if (NetworkServer.active)
             {
                 base.characterBody.AddBuff(RoR2Content.Buffs.ArmorBoost);
@@ -71,7 +75,8 @@ namespace RaindropLobotomy.EGO.Toolbot {
             return InterruptPriority.Pain;
         }
 
-        public void UpdateBoxes() {
+        public void UpdateBoxes()
+        {
             SphereSearch search = new();
             search.radius = 90f;
             search.origin = base.characterBody.corePosition;
@@ -82,22 +87,26 @@ namespace RaindropLobotomy.EGO.Toolbot {
             search.FilterCandidatesByHurtBoxTeam(TeamMask.GetUnprotectedTeams(GetTeam()));
 
             List<HurtBox> boxes = search.GetHurtBoxes().ToList();
-            line = new();
+            line = [];
 
-            if (boxes.Count <= 0f) {
+            if (boxes.Count <= 0f)
+            {
                 outer.SetNextStateToMain();
                 return;
             }
 
-            foreach (HurtBox box in boxes) {
-                if (!box.healthComponent.body || !box.healthComponent.body.master) {
+            foreach (HurtBox box in boxes)
+            {
+                if (!box.healthComponent.body || !box.healthComponent.body.master)
+                {
                     continue;
                 }
-                
+
                 line.Add(new(box.transform.position));
             }
 
-            foreach (GrinderPathPoint point in line) {
+            foreach (GrinderPathPoint point in line)
+            {
                 point.connected = LinkPoints(point, line);
                 point.NumConnected = point.connected.Length;
             }
@@ -119,23 +128,27 @@ namespace RaindropLobotomy.EGO.Toolbot {
             FindModelChild("LimitTrail").gameObject.SetActive(false);
 
             if (NetworkServer.active)
-			{
-				base.characterBody.RemoveBuff(RoR2Content.Buffs.ArmorBoost);
-			}
+            {
+                base.characterBody.RemoveBuff(RoR2Content.Buffs.ArmorBoost);
+            }
 
-            if (handle.HasValue) {
+            if (handle.HasValue)
+            {
                 base.GetComponent<CameraTargetParams>().RemoveParamsOverride(handle.Value);
             }
 
             base.characterMotor._gravityParameters.channeledAntiGravityGranterCount--;
         }
 
-        public IEnumerator CleanupDuty() {
+        public IEnumerator CleanupDuty()
+        {
             // PlayAnimation();
 
-            for (int i = 0; i < DashCount; i++) {
-                
-                if (base.skillLocator.special.stock < 1) {
+            for (int i = 0; i < DashCount; i++)
+            {
+
+                if (base.skillLocator.special.stock < 1)
+                {
                     goto end;
                 }
 
@@ -143,7 +156,8 @@ namespace RaindropLobotomy.EGO.Toolbot {
                 points = line.ToArray();
                 yield return new WaitForSeconds(0.2f);
 
-                for (int j = 0; j < points.Length; j++) {
+                for (int j = 0; j < points.Length; j++)
+                {
                     GrinderPathPoint segment = points[j];
 
                     /*if (!CheckLOS(base.transform.position, segment.origin)) {
@@ -154,22 +168,27 @@ namespace RaindropLobotomy.EGO.Toolbot {
 
                     Collider[] col = Physics.OverlapSphere(segment.origin, 5f, LayerIndex.entityPrecise.mask);
 
-                    for (int k = 0; k < col.Length; k++) {
+                    for (int k = 0; k < col.Length; k++)
+                    {
                         Collider collider = col[k];
 
-                        if (collider.GetComponent<HurtBox>()) {
+                        if (collider.GetComponent<HurtBox>())
+                        {
                             HurtBox hb = collider.GetComponent<HurtBox>();
-                            if (hb.healthComponent && hb.healthComponent.alive) {
+                            if (hb.healthComponent && hb.healthComponent.alive)
+                            {
                                 livingHurtboxes++;
                             }
                         }
                     }
 
-                    if (livingHurtboxes == 0) {
+                    if (livingHurtboxes == 0)
+                    {
                         continue;
                     }
 
-                    if (Vector3.Distance(base.transform.position, segment.origin) >= 5f && !CheckLOS(base.transform.position, segment.origin)) {
+                    if (Vector3.Distance(base.transform.position, segment.origin) >= 5f && !CheckLOS(base.transform.position, segment.origin))
+                    {
                         continue;
                     }
 
@@ -181,7 +200,8 @@ namespace RaindropLobotomy.EGO.Toolbot {
 
                     GameObject.Instantiate(Grinder.MultiSlash, FindModelChild("Chest"));
 
-                    while (!reachedTarget) {
+                    while (!reachedTarget)
+                    {
                         yield return new WaitForEndOfFrame();
                     }
 
@@ -195,7 +215,7 @@ namespace RaindropLobotomy.EGO.Toolbot {
                 base.skillLocator.special.DeductStock(1);
             }
 
-            end:
+        end:
 
             outer.SetNextStateToMain();
         }
@@ -204,38 +224,45 @@ namespace RaindropLobotomy.EGO.Toolbot {
         {
             base.FixedUpdate();
 
-            if (updateLastPosTimer.Tick()) {
-                if (Vector3.Distance(lastPos, base.transform.position) < 1f) {
+            if (updateLastPosTimer.Tick())
+            {
+                if (Vector3.Distance(lastPos, base.transform.position) < 1f)
+                {
                     reachedTarget = true;
                 }
 
                 lastPos = base.transform.position;
             }
 
-            if (base.fixedAge >= 10f) {
+            if (base.fixedAge >= 10f)
+            {
                 outer.SetNextStateToMain();
             }
 
-            if (target != Vector3.zero && !reachedTarget) {
+            if (target != Vector3.zero && !reachedTarget)
+            {
                 base.characterMotor.velocity = velocity * 140f;
                 base.characterDirection.forward = velocity;
 
                 Vector3 relativePos = target - base.transform.position;
 
-                if (Vector3.Dot(velocity, relativePos) < 0f) {
+                if (Vector3.Dot(velocity, relativePos) < 0f)
+                {
                     // base.characterMotor.velocity = Vector3.zero;
                     reachedTarget = true;
                 }
             }
-            
-            if (reachedTarget) {
+
+            if (reachedTarget)
+            {
                 base.characterMotor.velocity = Vector3.zero;
             }
 
             attack.Fire();
         }
 
-        public void RandomTeleport(Vector3 targetPos) {
+        public void RandomTeleport(Vector3 targetPos)
+        {
             Vector3 pos = targetPos + (Random.onUnitSphere * 2f);
             pos += Vector3.up * 2f;
 
@@ -244,19 +271,23 @@ namespace RaindropLobotomy.EGO.Toolbot {
             EffectManager.SimpleEffect(Paths.GameObject.MercExposeConsumeEffect, pos, Quaternion.identity, true);
         }
 
-        public void PlayAnimation() {
+        public void PlayAnimation()
+        {
             animBlades = FindModelChild("Blades").GetComponent<Animator>();
             animBlades.SetFloat("Split.playbackRate", 2f);
             PlayAnimationOnAnimator(animBlades, "Weapon", "Slash", "Split.playbackRate", 0.4f);
-            
+
             AkSoundEngine.PostEvent(Events.Play_bandit2_m2_slash, base.gameObject);
         }
 
-        public bool CheckHasLOSToOtherBox(HurtBox box, List<HurtBox> others) {
-            foreach (HurtBox other in others) {
+        public bool CheckHasLOSToOtherBox(HurtBox box, List<HurtBox> others)
+        {
+            foreach (HurtBox other in others)
+            {
                 if (box == other) continue;
 
-                if (CheckLOS(box.transform.position, other.transform.position)) {
+                if (CheckLOS(box.transform.position, other.transform.position))
+                {
                     return true;
                 }
             }
@@ -264,15 +295,18 @@ namespace RaindropLobotomy.EGO.Toolbot {
             return false;
         }
 
-        public bool CheckLOS(Vector3 origin, Vector3 target) {
+        public bool CheckLOS(Vector3 origin, Vector3 target)
+        {
             return !Physics.SphereCast(origin, 0.3f, (target - origin).normalized, out RaycastHit info, 30f, LayerIndex.world.mask);
         }
 
-        public GrinderPathPoint[] LinkPoints(GrinderPathPoint point, List<GrinderPathPoint> points) {
+        public GrinderPathPoint[] LinkPoints(GrinderPathPoint point, List<GrinderPathPoint> points)
+        {
             List<GrinderPathPoint> allPoints = points;
-            List<GrinderPathPoint> linkedPoints = new();
+            List<GrinderPathPoint> linkedPoints = [];
 
-            foreach (GrinderPathPoint point2 in points) {
+            foreach (GrinderPathPoint point2 in points)
+            {
                 if (point2 == point) continue;
 
                 if (CheckLOS(point.origin, point2.origin)) linkedPoints.Add(point2);
@@ -281,12 +315,14 @@ namespace RaindropLobotomy.EGO.Toolbot {
             return linkedPoints.ToArray();
         }
 
-        public class GrinderPathPoint {
+        public class GrinderPathPoint
+        {
             public Vector3 origin;
             public GrinderPathPoint[] connected;
             public int NumConnected;
 
-            public GrinderPathPoint(Vector3 _origin) {
+            public GrinderPathPoint(Vector3 _origin)
+            {
                 origin = _origin;
             }
         }

@@ -2,8 +2,10 @@ using System;
 using System.Linq;
 using RoR2;
 
-namespace RaindropLobotomy.EGO.Bandit {
-    public class MagicBullet : BaseSkillState {
+namespace RaindropLobotomy.EGO.Bandit
+{
+    public class MagicBullet : BaseSkillState
+    {
         public string PortalMuzzle = "PortalMuzzle";
         public string BulletMuzzle = "MuzzleShotgun";
         public GameObject PortalPrefab => EGOMagicBullet.PortalPrefab;
@@ -21,7 +23,7 @@ namespace RaindropLobotomy.EGO.Bandit {
             base.OnEnter();
 
             Ray aimRay = base.GetAimRay();
-            
+
             portal1 = GameObject.Instantiate(PortalPrefab, FindModelChild(PortalMuzzle));
             // portal1.GetComponent<BoxCollider>().size = new(7, 7, 1.5f);
             portal2 = GameObject.Instantiate(PortalPrefab, aimRay.GetPoint(5), Util.QuaternionSafeLookRotation(aimRay.direction));
@@ -36,15 +38,18 @@ namespace RaindropLobotomy.EGO.Bandit {
 
             HurtBox box = targeter.target?.GetComponent<HurtBox>() ?? null;
 
-            if (box) {
+            if (box)
+            {
                 shouldConsumeAmmo = true;
 
                 Vector3 position = box.transform.position + Vector3.up * 3f;
 
-                for (int i = 0; i < 50; i++) {
+                for (int i = 0; i < 50; i++)
+                {
                     position = (Random.onUnitSphere * 5) + box.transform.position;
 
-                    if (!Physics.SphereCast(position, 2f, (box.transform.position - position).normalized, out RaycastHit _, Vector3.Distance(box.transform.position, position) - 0.5f, LayerIndex.CommonMasks.bullet, QueryTriggerInteraction.Ignore)) {
+                    if (!Physics.SphereCast(position, 2f, (box.transform.position - position).normalized, out RaycastHit _, Vector3.Distance(box.transform.position, position) - 0.5f, LayerIndex.CommonMasks.bullet, QueryTriggerInteraction.Ignore))
+                    {
                         break;
                     }
                 }
@@ -53,10 +58,12 @@ namespace RaindropLobotomy.EGO.Bandit {
                 mbp2.aimTarget = box.transform;
             }
 
-            if (EGOMagicBullet.config.UseVanillaSounds) {
+            if (EGOMagicBullet.config.UseVanillaSounds)
+            {
                 AkSoundEngine.PostEvent(Events.Play_mage_m2_shoot, base.gameObject);
             }
-            else {
+            else
+            {
                 AkSoundEngine.PostEvent("Play_fruitloop_portal", base.gameObject);
             }
         }
@@ -67,7 +74,8 @@ namespace RaindropLobotomy.EGO.Bandit {
 
             StartAimMode(0.1f);
 
-            if (base.fixedAge >= 0.5f && !firedBullet) {
+            if (base.fixedAge >= 0.5f && !firedBullet)
+            {
                 firedBullet = true;
 
                 Vector3 position = portal1.transform.position;
@@ -82,10 +90,12 @@ namespace RaindropLobotomy.EGO.Bandit {
                 Transform muzzle = FindModelChild(BulletMuzzle);
                 float distance = Vector3.Distance(muzzle.position, portal1.transform.position);
 
-                if (EGOMagicBullet.config.UseVanillaSounds) {
+                if (EGOMagicBullet.config.UseVanillaSounds)
+                {
                     AkSoundEngine.PostEvent(Events.Play_bandit2_m1_rifle, base.gameObject);
                 }
-                else {
+                else
+                {
                     AkSoundEngine.PostEvent("Play_fruitloop_shot", base.gameObject);
                 }
 
@@ -104,17 +114,20 @@ namespace RaindropLobotomy.EGO.Bandit {
                 attack.smartCollision = true;
                 attack.maxDistance = distance;
 
-                if (shouldConsumeAmmo) {
+                if (shouldConsumeAmmo)
+                {
                     EGOMagicBullet.GiveAmmo(characterBody);
                 }
-                
-                if (isAuthority) {
+
+                if (isAuthority)
+                {
                     attack.Fire();
                     mbp1.FireBullet(attack);
                 }
             }
 
-            if (base.fixedAge >= 1.2f) {
+            if (base.fixedAge >= 1.2f)
+            {
                 outer.SetNextStateToMain();
             }
         }

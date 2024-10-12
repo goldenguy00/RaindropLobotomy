@@ -24,21 +24,27 @@ namespace RaindropLobotomy.Utils
             return false;
         }
 
-        public static bool GetIsAttacking(this CharacterBody body) {
-            List<string> esms = new();
+        public static bool GetIsAttacking(this CharacterBody body)
+        {
+            List<string> esms = [];
 
-            foreach (GenericSkill skill in body.GetComponents<GenericSkill>()) {
-                if (skill.skillDef) {
-                    if (!esms.Contains(skill.skillDef.activationStateMachineName)) {
+            foreach (GenericSkill skill in body.GetComponents<GenericSkill>())
+            {
+                if (skill.skillDef)
+                {
+                    if (!esms.Contains(skill.skillDef.activationStateMachineName))
+                    {
                         esms.Add(skill.skillDef.activationStateMachineName);
                     }
                 }
             }
 
-            foreach (string str in esms) {
+            foreach (string str in esms)
+            {
                 EntityStateMachine machine = EntityStateMachine.FindByCustomName(body.gameObject, str);
 
-                if (!machine.IsInMainState()) {
+                if (!machine.IsInMainState())
+                {
                     return true;
                 }
             }
@@ -54,7 +60,7 @@ namespace RaindropLobotomy.Utils
                 return;
             }
 
-            List<ItemDef> items = new();
+            List<ItemDef> items = [];
 
             foreach (ItemIndex item in body.inventory.itemAcquisitionOrder)
             {
@@ -77,7 +83,7 @@ namespace RaindropLobotomy.Utils
                 return;
             }
 
-            List<ItemDef> items = new();
+            List<ItemDef> items = [];
 
             foreach (ItemIndex item in body.inventory.itemAcquisitionOrder)
             {

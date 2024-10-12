@@ -1,7 +1,8 @@
 using System;
 using Rewired.ComponentControls.Effects;
 
-namespace RaindropLobotomy.Ordeals.Noon.Green {
+namespace RaindropLobotomy.Ordeals.Noon.Green
+{
     public class Saw : CoolerBasicMeleeAttack
     {
         public override float BaseDuration => 3f;
@@ -30,7 +31,7 @@ namespace RaindropLobotomy.Ordeals.Noon.Green {
 
         public override void PlayAnimation()
         {
-    
+
             defensive = GetModelAnimator().GetBool("isDefensive");
 
             GetModelAnimator().SetBool("isSawing", true);
@@ -75,7 +76,8 @@ namespace RaindropLobotomy.Ordeals.Noon.Green {
 
             stopwatch += Time.fixedDeltaTime;
 
-            if (stopwatch >= delay) {
+            if (stopwatch >= delay)
+            {
                 stopwatch = 0f;
                 overlapAttack.ResetIgnoredHealthComponents();
             }

@@ -16,11 +16,13 @@ namespace RaindropLobotomy.Utils
         private float[] timeTable;
         private float[] distanceTable;
 
-        public BeizerCurve() {
+        public BeizerCurve()
+        {
 
         }
 
-        public BeizerCurve(Vector3 p0, Vector3 p1, Vector3 p2) {
+        public BeizerCurve(Vector3 p0, Vector3 p1, Vector3 p2)
+        {
             this.p0 = p0;
             this.p1 = p1;
             this.p2 = p2;
@@ -33,7 +35,8 @@ namespace RaindropLobotomy.Utils
             Vector3 previous = GetBeizerPoint(0);
             float interval = 0f;
 
-            for (int i = 0; i < subdivisions; i++) {
+            for (int i = 0; i < subdivisions; i++)
+            {
                 interval = increment * i;
                 Vector3 point = GetBeizerPoint(interval);
                 float dist = Vector3.Distance(point, previous);
@@ -46,7 +49,8 @@ namespace RaindropLobotomy.Utils
             }
         }
 
-        public Vector3 GetBeizerPoint(float time) {
+        public Vector3 GetBeizerPoint(float time)
+        {
             return Vector3.Lerp(
                 Vector3.Lerp(p0, p1, time),
                 Vector3.Lerp(p1, p2, time),
@@ -54,10 +58,13 @@ namespace RaindropLobotomy.Utils
             );
         }
 
-        public Vector3 GetBeizerPointAtDistance(float distance) {
+        public Vector3 GetBeizerPointAtDistance(float distance)
+        {
             float t = 0;
-            for (int i = 0; i < distanceTable.Length; i++) {
-                if (distanceTable[i] > distance) {
+            for (int i = 0; i < distanceTable.Length; i++)
+            {
+                if (distanceTable[i] > distance)
+                {
                     break;
                 }
 
@@ -67,7 +74,8 @@ namespace RaindropLobotomy.Utils
             return GetBeizerPoint(t);
         }
 
-        public Vector3 GetRotationAlongCurve(float distance, float quality = 0.22f) {
+        public Vector3 GetRotationAlongCurve(float distance, float quality = 0.22f)
+        {
             Vector3 p1 = GetBeizerPoint(distance);
             Vector3 p2 = GetBeizerPointAtDistance(distance + quality);
 

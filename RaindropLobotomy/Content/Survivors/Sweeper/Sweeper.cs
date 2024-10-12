@@ -3,7 +3,6 @@ using System.Linq;
 using R2API.Networking;
 using R2API.Networking.Interfaces;
 using RoR2.CharacterAI;
-using ThreeEyedGames;
 
 #pragma warning disable
 

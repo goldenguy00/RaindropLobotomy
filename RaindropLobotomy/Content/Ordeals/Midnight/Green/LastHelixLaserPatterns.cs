@@ -1,7 +1,9 @@
 using System;
 
-namespace RaindropLobotomy.Ordeals.Midnight.Green {
-    public static class LastHelixLaserPatterns {
+namespace RaindropLobotomy.Ordeals.Midnight.Green
+{
+    public static class LastHelixLaserPatterns
+    {
         public static Vector3[][] AllPatterns = {
             CBT
         };
@@ -24,24 +26,28 @@ namespace RaindropLobotomy.Ordeals.Midnight.Green {
             new(-2f, 0f, 1f)
         };
 
-        public static Vector3[] GetPointSet(Vector3 origin, float scalar) {
+        public static Vector3[] GetPointSet(Vector3 origin, float scalar)
+        {
             Vector3[] copy = CBT;
             Vector3[] nodes = new Vector3[copy.Length];
 
-            for (int i = 0; i < nodes.Length; i++) {
+            for (int i = 0; i < nodes.Length; i++)
+            {
                 nodes[i] = (copy[i] * scalar) + origin;
             }
 
             return nodes;
         }
 
-        public static Vector3[] GetSpiralPointSet(Vector3 origin, float scalar, float initialRadius, int loops = 5) {
+        public static Vector3[] GetSpiralPointSet(Vector3 origin, float scalar, float initialRadius, int loops = 5)
+        {
             Vector3[] points = new Vector3[360 * loops];
 
             float radius = initialRadius;
             float radialStep = (scalar - initialRadius) / (loops * 360f);
 
-            for (int i = 0; i < 360 * loops; i++) {
+            for (int i = 0; i < 360 * loops; i++)
+            {
                 int j = i > 360 ? i - 360 : i;
 
                 float rad = j * 2 * Mathf.PI / 360f;

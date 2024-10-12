@@ -1,7 +1,9 @@
 using System;
 
-namespace RaindropLobotomy.Enemies.SteamMachine {
-    public class SteamMachineMain : GenericCharacterMain {
-        
+namespace RaindropLobotomy.Enemies.SteamMachine
+{
+    public class SteamMachineMain : GenericCharacterMain
+    {
+
     }
 }

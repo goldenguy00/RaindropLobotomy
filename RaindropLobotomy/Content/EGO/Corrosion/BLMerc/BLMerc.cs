@@ -4,7 +4,8 @@ using R2API.Networking.Interfaces;
 using R2API.Utils;
 using UnityEngine.TextCore;
 
-namespace RaindropLobotomy.EGO.Merc {
+namespace RaindropLobotomy.EGO.Merc
+{
     public class BLMerc : CorrosionBase<BLMerc>
     {
         public override string EGODisplayName => "Blade Lineage Mercenary";
@@ -33,8 +34,8 @@ namespace RaindropLobotomy.EGO.Merc {
         public static GameObject WarpTrail;
         public static GameObject DarkFlare;
         //
-        private static Dictionary<CharacterBody, SwordplayState> SwordplayMap = new();
-        private static Dictionary<CharacterBody, bool> YieldingMap = new();
+        private static Dictionary<CharacterBody, SwordplayState> SwordplayMap = [];
+        private static Dictionary<CharacterBody, bool> YieldingMap = [];
         //
         public static SkillDef ToClaimTheirBones;
         public static DamageAPI.ModdedDamageType PoiseDamageBonus = new();
@@ -44,7 +45,7 @@ namespace RaindropLobotomy.EGO.Merc {
             base.Modify();
 
             BodyPrefab.GetComponent<CameraTargetParams>().cameraParams = Paths.CharacterCameraParams.ccpStandardMelee;
-            
+
             BodyPrefab.GetComponent<ModelLocator>()._modelTransform.GetComponent<Animator>().runtimeAnimatorController = Paths.RuntimeAnimatorController.animMerc;
             BodyPrefab.GetComponent<ModelLocator>()._modelTransform.GetComponent<CharacterModel>().itemDisplayRuleSet = Paths.ItemDisplayRuleSet.idrsMerc;
             Load<GameObject>("BLMercDisplay.prefab").GetComponentInChildren<Animator>().runtimeAnimatorController = Paths.RuntimeAnimatorController.animMercDisplay;
@@ -62,7 +63,7 @@ namespace RaindropLobotomy.EGO.Merc {
             DarkFlare = Load<GameObject>("BL_BladeShing.prefab");
 
             ToClaimTheirBones = Load<SkillDef>("BL_ToClaimTheirBones.asset");
-
+            //illegal
             On.RoR2.CharacterBody.UpdateAllTemporaryVisualEffects += BoneClaiming;
             On.RoR2.CharacterModel.UpdateOverlays += BoneClaiming2;
             On.RoR2.HealthComponent.TakeDamageProcess += PoiseCritBonus;
@@ -70,19 +71,19 @@ namespace RaindropLobotomy.EGO.Merc {
             NetworkingAPI.RegisterMessageType<SyncTCTB>();
         }
 
-        private void PoiseCritBonus(On.RoR2.HealthComponent.orig_TakeDamageProcess orig, HealthComponent self, DamageInfo damageInfo)
+        private static void PoiseCritBonus(On.RoR2.HealthComponent.orig_TakeDamageProcess orig, HealthComponent self, DamageInfo damageInfo)
         {
-            if (damageInfo.crit && damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() && damageInfo.HasModdedDamageType(PoiseDamageBonus)) {
-                CharacterBody characterBody = damageInfo.attacker.GetComponent<CharacterBody>();
+            if (damageInfo.HasModdedDamageType(PoiseDamageBonus) && damageInfo.crit && damageInfo.attacker && damageInfo.attacker.TryGetComponent<CharacterBody>(out var characterBody))
+            {
                 int poiseCount = characterBody.GetBuffCount(Buffs.Poise.Instance.Buff);
                 poiseCount = Mathf.Clamp(poiseCount, 0, 20);
-                damageInfo.damage *= 1f + ((poiseCount / 4f) * 0.1f);
+                damageInfo.damage *= 1f + (poiseCount / 4f * 0.1f);
             }
 
             orig(self, damageInfo);
         }
 
-        private void BoneClaiming2(On.RoR2.CharacterModel.orig_UpdateOverlays orig, CharacterModel self)
+        private static void BoneClaiming2(On.RoR2.CharacterModel.orig_UpdateOverlays orig, CharacterModel self)
         {
             orig(self);
 
@@ -97,18 +98,15 @@ namespace RaindropLobotomy.EGO.Merc {
             }
         }
 
-        private void BoneClaiming(On.RoR2.CharacterBody.orig_UpdateAllTemporaryVisualEffects orig, CharacterBody self)
+        private static void BoneClaiming(On.RoR2.CharacterBody.orig_UpdateAllTemporaryVisualEffects orig, CharacterBody self)
         {
             orig(self);
 
-            self.UpdateSingleTemporaryVisualEffect(ref self.doppelgangerEffectInstance, CharacterBody.AssetReferences.doppelgangerEffectPrefab, self.bestFitRadius, IsBoning(self) || ((self.inventory != null && (self.inventory.GetItemCount(RoR2Content.Items.InvadingDoppelganger) > 0))), "Head");
+            self.UpdateSingleTemporaryVisualEffect(ref self.doppelgangerEffectInstance, CharacterBody.AssetReferences.doppelgangerEffectPrefab, self.bestFitRadius,
+                IsBoning(self) || (self.inventory != null && (self.inventory.GetItemCount(RoR2Content.Items.InvadingDoppelganger) > 0)), "Head");
         }
 
-        private bool IsBoning(CharacterBody body) {
-            if (!body || !YieldingMap.ContainsKey(body)) return false;
-
-            return YieldingMap[body];
-        }
+        private static bool IsBoning(CharacterBody body) => !body || !YieldingMap.TryGetValue(body, out var bone) ? false : YieldingMap[body];
 
         public override void SetupLanguage()
         {
@@ -150,24 +148,30 @@ namespace RaindropLobotomy.EGO.Merc {
             );
         }
 
-        public static void UpdateYieldingState(CharacterBody body, bool newState) {
-            if (!YieldingMap.ContainsKey(body)) {
+        public static void UpdateYieldingState(CharacterBody body, bool newState)
+        {
+            if (!YieldingMap.ContainsKey(body))
+            {
                 YieldingMap.Add(body, newState);
             }
 
             YieldingMap[body] = newState;
 
-            body.RecalculateStats();
+            body.statsDirty = true;
         }
 
-        public static void UpdateSwordplayState(CharacterBody body, SwordplayState newState) {
-            if (!SwordplayMap.ContainsKey(body)) {
+        public static void UpdateSwordplayState(CharacterBody body, SwordplayState newState)
+        {
+            if (!SwordplayMap.ContainsKey(body))
+            {
                 SwordplayMap.Add(body, newState);
             }
 
 
-            if (newState != SwordplayMap[body]) {
-                if (NetworkServer.active) {
+            if (newState != SwordplayMap[body])
+            {
+                if (NetworkServer.active)
+                {
                     int count = body.GetBuffCount(Buffs.Poise.Instance.Buff);
                     body.SetBuffCount(Buffs.Poise.Instance.Buff.buffIndex, Mathf.Clamp(count + 1, 0, 20));
                 }
@@ -178,7 +182,7 @@ namespace RaindropLobotomy.EGO.Merc {
 
             SwordplayMap[body] = newState;
         }
-        
+
     }
 
     public class SyncTCTB : INetMessage
@@ -203,7 +207,8 @@ namespace RaindropLobotomy.EGO.Merc {
         {
             EntityStateMachine machine = EntityStateMachine.FindByCustomName(applyTo, "Body");
 
-            if (machine.state is YieldMyFlesh) {
+            if (machine.state is YieldMyFlesh)
+            {
                 (machine.state as YieldMyFlesh).ReceiveInfo(target, damage);
             }
         }
@@ -215,18 +220,21 @@ namespace RaindropLobotomy.EGO.Merc {
             writer.Write((double)damage);
         }
 
-        public SyncTCTB() {
+        public SyncTCTB()
+        {
 
         }
 
-        public SyncTCTB(GameObject applyTo, GameObject target, float damage) {
+        public SyncTCTB(GameObject applyTo, GameObject target, float damage)
+        {
             this.applyTo = applyTo;
             this.target = target;
             this.damage = damage;
         }
     }
 
-    public enum SwordplayState {
+    public enum SwordplayState
+    {
         Slash,
         BigSlash,
         Thrust,

@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 
-namespace RaindropLobotomy.EGO.FalseSon {
-    public class PiercingShriek : BaseSkillState {
+namespace RaindropLobotomy.EGO.FalseSon
+{
+    public class PiercingShriek : BaseSkillState
+    {
         public float damageCoeff = 4f;
         public float range = 40f;
         public float angle = 70f;
@@ -13,7 +15,7 @@ namespace RaindropLobotomy.EGO.FalseSon {
             base.OnEnter();
 
             PlayCrossfade("Gesture, Head, Override", "FireLaserLoop", 0.25f);
-		    PlayCrossfade("Gesture, Head, Additive", "FireLaserLoop", 0.25f);
+            PlayCrossfade("Gesture, Head, Additive", "FireLaserLoop", 0.25f);
 
             GameObject.Instantiate(EGOJustitia.JustitiaShriek, base.inputBank.aimOrigin + (base.inputBank.aimDirection), Quaternion.LookRotation(base.inputBank.aimDirection));
 
@@ -24,7 +26,8 @@ namespace RaindropLobotomy.EGO.FalseSon {
 
             base.StartAimMode(duration);
 
-            if (NetworkServer.active) {
+            if (NetworkServer.active)
+            {
                 BullseyeSearch search = new();
                 search.maxDistanceFilter = range;
                 search.maxAngleFilter = angle;
@@ -36,9 +39,11 @@ namespace RaindropLobotomy.EGO.FalseSon {
                 search.RefreshCandidates();
 
                 IEnumerable<HurtBox> hurtBoxes = search.GetResults();
-                
-                foreach (HurtBox box in hurtBoxes) {
-                    if (box.healthComponent) {
+
+                foreach (HurtBox box in hurtBoxes)
+                {
+                    if (box.healthComponent)
+                    {
                         CharacterBody body = box.healthComponent.body;
                         int sin = body.GetBuffCount(Buffs.Sin.BuffIndex);
                         body.SetBuffCount(Buffs.Sin.BuffIndex, sin + 3);
@@ -49,7 +54,7 @@ namespace RaindropLobotomy.EGO.FalseSon {
                         damage.position = box.transform.position;
                         damage.damage = base.damageStat * damageCoeff;
                         damage.procCoefficient = 1;
-                        
+
                         box.healthComponent.TakeDamage(damage);
                         GlobalEventManager.instance.OnHitAll(damage, body.gameObject);
                         GlobalEventManager.instance.OnHitEnemy(damage, body.gameObject);
@@ -62,7 +67,8 @@ namespace RaindropLobotomy.EGO.FalseSon {
         {
             base.FixedUpdate();
 
-            if (base.fixedAge >= duration) {
+            if (base.fixedAge >= duration)
+            {
                 outer.SetNextStateToMain();
             }
         }
@@ -77,7 +83,7 @@ namespace RaindropLobotomy.EGO.FalseSon {
             base.OnExit();
 
             PlayAnimation("Gesture, Head, Override", "FireLaserLoopEnd");
-		    PlayAnimation("Gesture, Head, Additive", "FireLaserLoopEnd");
+            PlayAnimation("Gesture, Head, Additive", "FireLaserLoopEnd");
         }
     }
 }

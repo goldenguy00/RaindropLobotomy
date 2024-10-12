@@ -1,7 +1,9 @@
 using System;
 
-namespace RaindropLobotomy.EGO.Commando {
-    public class Tranquility : BaseSkillState {
+namespace RaindropLobotomy.EGO.Commando
+{
+    public class Tranquility : BaseSkillState
+    {
         public float duration = 5f;
         public float minCancelTime = 1.5f;
         public float damageCoefficient = 4f;
@@ -15,7 +17,8 @@ namespace RaindropLobotomy.EGO.Commando {
 
             GetComponent<ContactDamage>().enabled = true;
 
-            EffectManager.SpawnEffect(Paths.GameObject.Bandit2SmokeBomb, new EffectData {
+            EffectManager.SpawnEffect(Paths.GameObject.Bandit2SmokeBomb, new EffectData
+            {
                 origin = base.transform.position,
                 scale = 2f
             }, false);
@@ -23,7 +26,8 @@ namespace RaindropLobotomy.EGO.Commando {
             base.gameObject.layer = LayerIndex.fakeActor.intVal;
             base.characterMotor.Motor.RebuildCollidableLayers();
 
-            if (NetworkServer.active) {
+            if (NetworkServer.active)
+            {
                 base.characterBody.AddBuff(RoR2Content.Buffs.CloakSpeed);
             }
 
@@ -34,7 +38,8 @@ namespace RaindropLobotomy.EGO.Commando {
         {
             base.FixedUpdate();
 
-            if (base.fixedAge >= duration || (base.inputBank.skill3.down && base.fixedAge >= minCancelTime)) {
+            if (base.fixedAge >= duration || (base.inputBank.skill3.down && base.fixedAge >= minCancelTime))
+            {
                 outer.SetNextStateToMain();
             }
         }
@@ -58,18 +63,20 @@ namespace RaindropLobotomy.EGO.Commando {
             attack.falloffModel = BlastAttack.FalloffModel.Linear;
             attack.procCoefficient = 1;
             attack.AddModdedDamageType(SolemnLament.Seal);
-            
+
             if (base.isAuthority) attack.Fire();
 
             base.gameObject.layer = LayerIndex.defaultLayer.intVal;
             base.characterMotor.Motor.RebuildCollidableLayers();
 
-            EffectManager.SpawnEffect(Paths.GameObject.Bandit2SmokeBomb, new EffectData {
+            EffectManager.SpawnEffect(Paths.GameObject.Bandit2SmokeBomb, new EffectData
+            {
                 origin = base.transform.position,
                 scale = 2f
             }, false);
 
-            if (NetworkServer.active) {
+            if (NetworkServer.active)
+            {
                 base.characterBody.RemoveBuff(RoR2Content.Buffs.CloakSpeed);
             }
         }

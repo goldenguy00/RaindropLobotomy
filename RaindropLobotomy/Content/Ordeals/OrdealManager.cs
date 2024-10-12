@@ -19,7 +19,8 @@ using System.Collections;
 
 namespace RaindropLobotomy.Ordeals
 {
-    public class OrdealManager {
+    public class OrdealManager
+    {
         public static Dictionary<OrdealLevel, List<OrdealBase>> ordeals = new() {
             {OrdealLevel.DAWN, new() {}},
             {OrdealLevel.NOON, new() {}},
@@ -54,8 +55,10 @@ namespace RaindropLobotomy.Ordeals
         public static OrdealConfig Config = new();
         public static OrdealTimer Timer;
 
-        public static void Initialize() {
-            if (!Config.Enabled) {
+        public static void Initialize()
+        {
+            if (!Config.Enabled)
+            {
                 return;
             }
 
@@ -81,7 +84,8 @@ namespace RaindropLobotomy.Ordeals
             SetupOrdeal(self);
         }
 
-        private static void CreateOrdealTimerUI() {
+        private static void CreateOrdealTimerUI()
+        {
             ordealUI = PrefabAPI.InstantiateClone(Paths.GameObject.HudCountdownPanel, "Ordeal UI");
             ChildLocator loc = ordealUI.AddComponent<ChildLocator>();
             LayoutElement element = ordealUI.AddComponent<LayoutElement>();
@@ -130,17 +134,20 @@ namespace RaindropLobotomy.Ordeals
                 writer.Write(index);
             }
 
-            public OrdealReceived() {
+            public OrdealReceived()
+            {
 
             }
 
-            public OrdealReceived(int ordeal, int index) {
+            public OrdealReceived(int ordeal, int index)
+            {
                 this.ordeal = ordeal;
                 this.index = index;
             }
         }
 
-        private static void CreateOrdealPopupUI() { 
+        private static void CreateOrdealPopupUI()
+        {
             ordealPopupUI = PrefabAPI.InstantiateClone(Paths.GameObject.AchievementNotificationPanel, "OrdealPopupUI");
             ordealPopupUI.GetComponent<RectTransform>().position = new(0, 90, 0);
             ordealPopupUI.transform.Find("Backdrop").GetComponent<Image>().color = new Color32(95, 95, 95, 255);
@@ -189,13 +196,15 @@ namespace RaindropLobotomy.Ordeals
 
         }
 
-        private static void SetupOrdeal(RoR2.Stage stage) {
+        private static void SetupOrdeal(RoR2.Stage stage)
+        {
             OrdealBase ordeal = GetNextOrdealType(SceneCatalog.mostRecentSceneDef);
-            if (ordeal == null) {
+            if (ordeal == null)
+            {
                 // Debug.Log("returning because no ordeal");
                 return;
             }
-            
+
             OrdealTimer timer = stage.AddComponent<OrdealTimer>();
             timer.ordeal = ordeal;
 
@@ -204,12 +213,14 @@ namespace RaindropLobotomy.Ordeals
             ObjectivePanelController.collectObjectiveSources += CollectSources;
         }
 
-        private static void SetupOrdeal(OrdealBase ordeal) {
-            if (ordeal == null) {
+        private static void SetupOrdeal(OrdealBase ordeal)
+        {
+            if (ordeal == null)
+            {
                 // Debug.Log("returning because no ordeal");
                 return;
             }
-            
+
             OrdealTimer timer = RoR2.Stage.instance.AddComponent<OrdealTimer>();
             timer.ordeal = ordeal;
 
@@ -218,15 +229,20 @@ namespace RaindropLobotomy.Ordeals
             ObjectivePanelController.collectObjectiveSources += CollectSources;
         }
 
-        private static void CollectSources(CharacterMaster master, List<ObjectivePanelController.ObjectiveSourceDescriptor> sources) {
-            sources.Add(new ObjectivePanelController.ObjectiveSourceDescriptor() {
+        private static void CollectSources(CharacterMaster master, List<ObjectivePanelController.ObjectiveSourceDescriptor> sources)
+        {
+            sources.Add(new ObjectivePanelController.ObjectiveSourceDescriptor()
+            {
                 master = master,
                 objectiveType = typeof(OrdealObjective),
-                source = Timer});
+                source = Timer
+            });
         }
 
-        public static void SpawnOrdealPopupUI(OrdealBase ordeal) {
-            if (!Config.ShowPopup) {
+        public static void SpawnOrdealPopupUI(OrdealBase ordeal)
+        {
+            if (!Config.ShowPopup)
+            {
                 return;
             }
 
@@ -240,7 +256,8 @@ namespace RaindropLobotomy.Ordeals
             ChangeIcon(loc.FindChild("RightIcon"), ordeal);
         }
 
-        private static void ChangeText(Transform transform, string text, Color32 col) {
+        private static void ChangeText(Transform transform, string text, Color32 col)
+        {
             TextMeshProUGUI gui = transform.GetComponent<HGTextMeshProUGUI>();
             gui.text = text;
             gui.color = col;
@@ -248,18 +265,21 @@ namespace RaindropLobotomy.Ordeals
             gui.alignment = TextAlignmentOptions.Center;
         }
 
-        private static void ChangeIcon(Transform transform, OrdealBase ordeal) {
+        private static void ChangeIcon(Transform transform, OrdealBase ordeal)
+        {
             Image image = transform.Find("Icon").GetComponent<Image>();
-            image.sprite = ordeal.OrdealLevel switch {
+            image.sprite = ordeal.OrdealLevel switch
+            {
                 OrdealLevel.DAWN => Load<Sprite>("Dawn.png"),
-                 OrdealLevel.NOON => Load<Sprite>("Noon.png"),
+                OrdealLevel.NOON => Load<Sprite>("Noon.png"),
                 OrdealLevel.DUSK => Load<Sprite>("Dawn.png"),
                 OrdealLevel.MIDNIGHT => Load<Sprite>("Midnight.png"),
             };
             image.color = ordeal.Color;
         }
 
-        private static OrdealBase GetNextOrdealType(SceneDef scene) {
+        private static OrdealBase GetNextOrdealType(SceneDef scene)
+        {
             if (scene.sceneType != SceneType.Stage) return null;
             if (scene.cachedName == "moon" || scene.cachedName == "moon2") return null;
 
@@ -267,7 +287,8 @@ namespace RaindropLobotomy.Ordeals
             Debug.Log(i);
             OrdealLevel ordeal = OrdealLevel.DAWN;
 
-            ordeal = i switch {
+            ordeal = i switch
+            {
                 1 => OrdealLevel.DAWN,
                 2 => OrdealLevel.DAWN,
                 3 => OrdealLevel.NOON,
@@ -281,7 +302,8 @@ namespace RaindropLobotomy.Ordeals
 
             // Debug.Log("Setting ordeal to: " + ordeal.ToString());
 
-            if (options.Length == 0) {
+            if (options.Length == 0)
+            {
                 // Debug.Log("no options for that ordea, returning.");
                 return null;
             }
@@ -293,48 +315,55 @@ namespace RaindropLobotomy.Ordeals
             return options[index];
         }
 
-        public class OrdealTimer : MonoBehaviour {
+        public class OrdealTimer : MonoBehaviour
+        {
             private float totalDuration;
             public float duration;
             public OrdealBase ordeal;
             private bool startedOrdeal = false;
 
-            public void Start() {
-                totalDuration = ordeal.OrdealLevel switch {
+            public void Start()
+            {
+                totalDuration = ordeal.OrdealLevel switch
+                {
                     OrdealLevel.DAWN => Config.DawnTimer,
                     OrdealLevel.NOON => Config.NoonTimer,
                     OrdealLevel.DUSK => Config.DuskTimer,
                     OrdealLevel.MIDNIGHT => Config.MidnightTimer,
                     _ => 60 * 5f
                 };
-                
+
                 duration = totalDuration;
                 // duration = 10f;
             }
 
-            public void FixedUpdate() {
+            public void FixedUpdate()
+            {
                 duration -= Time.fixedDeltaTime;
 
-                if (duration <= 0f && !startedOrdeal) {
+                if (duration <= 0f && !startedOrdeal)
+                {
                     startedOrdeal = true;
 
                     SpawnOrdealPopupUI(ordeal);
-                    
-                    if (NetworkServer.active) {
+
+                    if (NetworkServer.active)
+                    {
                         ordeal.OnSpawnOrdeal(RoR2.Stage.instance);
                     }
                 }
             }
         }
 
-        public class OrdealObjective : ObjectivePanelController.ObjectiveTracker {
+        public class OrdealObjective : ObjectivePanelController.ObjectiveTracker
+        {
             public OrdealTimer ordealTimer = null;
             public override string GenerateString()
             {
                 if (ordealTimer == null) ordealTimer = sourceDescriptor.source as OrdealTimer;
                 string col = $"#{ColorUtility.ToHtmlStringRGBA(ordealTimer.ordeal.Color)}";
 
-                return 
+                return
                 $"Prepare for the <color={col}>{ordealTimer.ordeal.RiskTitle}</color> - <style=cStack>({(ordealTimer.duration >= 0f ? TimeSpan.FromSeconds(ordealTimer.duration).ToString(@"mm\:ss") : "XX:XX")})</style>";
             }
             public override bool IsDirty()

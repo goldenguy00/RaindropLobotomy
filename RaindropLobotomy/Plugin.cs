@@ -21,7 +21,8 @@ using System.Collections;
 
 [assembly: HG.Reflection.SearchableAttribute.OptIn]
 
-namespace RaindropLobotomy {
+namespace RaindropLobotomy
+{
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
     [BepInDependency(Survariants.Survariants.PluginGUID)]
     [BepInDependency(R2API.DotAPI.PluginGUID)]
@@ -33,8 +34,9 @@ namespace RaindropLobotomy {
     [BepInDependency(PrefabAPI.PluginGUID, BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency(R2API.ContentManagement.R2APIContentManager.PluginGUID, BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("com.rob.Paladin", BepInDependency.DependencyFlags.SoftDependency)]
-    
-    public class Main : BaseUnityPlugin {
+
+    public class Main : BaseUnityPlugin
+    {
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "BALLS";
         public const string PluginName = "RaindropLobotomy";
@@ -48,7 +50,7 @@ namespace RaindropLobotomy {
 
         public static float[] RandomizedPercentages = new float[25];
         private float stopwatch = 0f;
-        public static Dictionary<HealthComponent, int> PercentagesMap = new();
+        public static Dictionary<HealthComponent, int> PercentagesMap = [];
         // compat
         public static bool paladinInstalled;
 
@@ -59,13 +61,14 @@ namespace RaindropLobotomy {
 
             public override void Initialize()
             {
-                
+
             }
         }
 
         public static MainConfiguration MainConfig = new();
 
-        public void Awake() {
+        public void Awake()
+        {
             assembly = typeof(Main).Assembly;
             ModLogger = Logger;
             MainAssets = AssetBundle.LoadFromFile(assembly.Location.Replace("RaindropLobotomy.dll", "enkephalin"));
@@ -89,19 +92,27 @@ namespace RaindropLobotomy {
 
             ForAllAssets<SkillDef>(x => ContentAddition.AddSkillDef(x));
             ForAllAssets<SkillFamily>(x => ContentAddition.AddSkillFamily(x));
-            ForAllAssets<GameObject>(x => {
-                if (x.GetComponent<NetworkIdentity>()) {
+            ForAllAssets<GameObject>(x =>
+            {
+                // fuck you
+                if (x.name == "LampBody")
+                    return;
+                if (x.GetComponent<NetworkIdentity>())
+                {
                     // Debug.Log("Adding Networked Object: " + x);
                     PrefabAPI.RegisterNetworkPrefab(x);
                     ContentAddition.AddNetworkedObject(x);
                 }
 
-                if (x.GetComponent<EffectComponent>()) {
+                if (x.GetComponent<EffectComponent>())
+                {
                     ContentAddition.AddEffect(x);
                 }
             });
 
-            ScanTypes<EntityState>((Type x) => {
+            ScanTypes<EntityState>((Type x) =>
+            {
+                Logger.LogError(x.Name);
                 ContentAddition.AddEntityState(x, out _);
             });
 
@@ -113,7 +124,7 @@ namespace RaindropLobotomy {
         private void OnWwiseInit(On.RoR2.RoR2Content.orig_Init orig)
         {
             orig();
-            
+
             Logger.LogError("RL: Loading Soundbanks");
 
             string path = typeof(Main).Assembly.Location.Replace("RaindropLobotomy.dll", "");
@@ -123,25 +134,31 @@ namespace RaindropLobotomy {
             AkSoundEngine.LoadBank("RLBank", out _);
         }
 
-        public void Start() { // needs to happen in start to ensure we do this after any other mods we might softdep on have done theirs
-            ScanTypes<CorrosionBase>(x => 
+        public void Start()
+        { // needs to happen in start to ensure we do this after any other mods we might softdep on have done theirs
+            ScanTypes<CorrosionBase>(x =>
                 {
-                    if (x.AreWeAllowedToLoad()) { // do a check first as some variants are given to different mods when present (ex: index mercenary -> index paladin)
+                    if (x.AreWeAllowedToLoad())
+                    { // do a check first as some variants are given to different mods when present (ex: index mercenary -> index paladin)
                         x.Create();
                     }
                 }
             );
         }
 
-        public static T Load<T>(string key) where T : UnityEngine.Object {
+        public static T Load<T>(string key) where T : UnityEngine.Object
+        {
             return MainAssets.LoadAsset<T>(key);
         }
 
-        public static void StubShaders(AssetBundle bundle) {
+        public static void StubShaders(AssetBundle bundle)
+        {
             Material[] mats = MainAssets.LoadAllAssets<Material>();
 
-            foreach (Material mat in mats) {
-                mat.shader = mat.shader.name switch {
+            foreach (Material mat in mats)
+            {
+                mat.shader = mat.shader.name switch
+                {
                     "StubbedShader/deferred/hgstandard" => Paths.Shader.HGStandard,
                     "StubbedShader/fx/hgcloudremap" => Paths.Shader.HGCloudRemap,
                     "Hopoo Games/FX/Cloud Remap" => Paths.Shader.HGCloudRemap,
@@ -150,42 +167,53 @@ namespace RaindropLobotomy {
             }
         }
 
-        public static void ForAllAssets<T>(Action<T> action) where T : UnityEngine.Object {
+        public static void ForAllAssets<T>(Action<T> action) where T : UnityEngine.Object
+        {
             T[] ts = MainAssets.LoadAllAssets<T>();
-            for (int i = 0; i < ts.Length; i++) {
+            for (int i = 0; i < ts.Length; i++)
+            {
                 action(ts[i]);
             }
         }
 
-        public static float GetPercentage(HealthComponent comp) {
-            if (comp == null) {
+        public static float GetPercentage(HealthComponent comp)
+        {
+            if (comp == null)
+            {
                 return 1f;
             }
 
-            if (!PercentagesMap.ContainsKey(comp)) {
+            if (!PercentagesMap.ContainsKey(comp))
+            {
                 PercentagesMap[comp] = Random.Range(0, RandomizedPercentages.Length);
             }
 
             return RandomizedPercentages[PercentagesMap[comp]];
         }
 
-        public void FixedUpdate() {
+        public void FixedUpdate()
+        {
             stopwatch += Time.fixedDeltaTime;
 
-            if (stopwatch >= 0.8f) {
+            if (stopwatch >= 0.8f)
+            {
                 stopwatch = 0f;
 
-                for (int i = 0; i < RandomizedPercentages.Length; i++) {
+                for (int i = 0; i < RandomizedPercentages.Length; i++)
+                {
                     RandomizedPercentages[i] = Random.Range(0f, 1f);
                 }
             }
         }
 
-        public static void ScanTypes<T>(Action<T> action) {
+        public static void ScanTypes<T>(Action<T> action)
+        {
             IEnumerable<Type> types = assembly.GetTypes().Where(x => !x.IsAbstract && x.IsSubclassOf(typeof(T)));
 
-            foreach (Type type in types) {
-                if (typeof(T) == typeof(SurvivorBase) && type.IsSubclassOf(typeof(CorrosionBase))) {
+            foreach (Type type in types)
+            {
+                if (typeof(T) == typeof(SurvivorBase) && type.IsSubclassOf(typeof(CorrosionBase)))
+                {
                     continue;
                 }
 
@@ -194,11 +222,14 @@ namespace RaindropLobotomy {
             }
         }
 
-        public static void ScanTypes<T>(Action<Type> action) {
+        public static void ScanTypes<T>(Action<Type> action)
+        {
             IEnumerable<Type> types = assembly.GetTypes().Where(x => !x.IsAbstract && x.IsSubclassOf(typeof(T)));
 
-            foreach (Type type in types) {
-                if (typeof(T) == typeof(SurvivorBase) && type.IsSubclassOf(typeof(CorrosionBase))) {
+            foreach (Type type in types)
+            {
+                if (typeof(T) == typeof(SurvivorBase) && type.IsSubclassOf(typeof(CorrosionBase)))
+                {
                     continue;
                 }
 

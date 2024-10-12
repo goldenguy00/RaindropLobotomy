@@ -1,7 +1,9 @@
 using System;
 
-namespace RaindropLobotomy.EGO.Merc {
-    public class Compress : BaseSkillState {
+namespace RaindropLobotomy.EGO.Merc
+{
+    public class Compress : BaseSkillState
+    {
         public Animator animator;
         public bool didStrike = false;
         public override void OnEnter()
@@ -15,17 +17,20 @@ namespace RaindropLobotomy.EGO.Merc {
         {
             base.FixedUpdate();
 
-            if (animator && !didStrike && animator.GetFloat("Hitbox.active") > 0.65f) {
+            if (animator && !didStrike && animator.GetFloat("Hitbox.active") > 0.65f)
+            {
                 didStrike = true;
                 Explode();
             }
 
-            if (base.fixedAge >= 2f) {
+            if (base.fixedAge >= 2f)
+            {
                 outer.SetNextStateToMain();
             }
         }
 
-        public void Explode() {
+        public void Explode()
+        {
             BlastAttack attack = new();
             attack.position = base.transform.position;
             attack.radius = 7f;
@@ -41,10 +46,11 @@ namespace RaindropLobotomy.EGO.Merc {
 
             attack.Fire();
 
-            EffectManager.SpawnEffect(Paths.GameObject.HermitCrabBombExplosion, new EffectData {
-                            origin = base.transform.position,
-                            scale = 5f
-                        }, false);
+            EffectManager.SpawnEffect(Paths.GameObject.HermitCrabBombExplosion, new EffectData
+            {
+                origin = base.transform.position,
+                scale = 5f
+            }, false);
         }
 
         public override void OnExit()

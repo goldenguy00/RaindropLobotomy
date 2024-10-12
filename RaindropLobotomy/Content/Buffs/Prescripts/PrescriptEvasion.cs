@@ -1,9 +1,10 @@
 using System;
 
-namespace RaindropLobotomy.Buffs {
+namespace RaindropLobotomy.Buffs
+{
     public class PrescriptEvasion : BuffBase<PrescriptEvasion>
     {
-        public override BuffDef Buff => Load<BuffDef>("bdPrescriptEvasion.asset");
+        public override BuffDef Buff { get; set; } = Load<BuffDef>("bdPrescriptEvasion.asset");
 
         public override void PostCreation()
         {
@@ -14,7 +15,8 @@ namespace RaindropLobotomy.Buffs {
         {
             orig(self);
 
-            if (self.HasBuff(Buff)) {
+            if (self.HasBuff(Buff))
+            {
                 self.moveSpeed *= 1.5f;
                 self.maxJumpCount += 3;
                 self.acceleration *= 2f;

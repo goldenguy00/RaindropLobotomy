@@ -1,6 +1,7 @@
 using System;
 
-namespace RaindropLobotomy.Enemies.Fragment {
+namespace RaindropLobotomy.Enemies.Fragment
+{
     public class Penetrate : CoolerBasicMeleeAttack
     {
         public override float BaseDuration => 1.2f;

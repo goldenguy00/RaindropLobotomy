@@ -2,8 +2,10 @@ using System;
 using R2API.Networking.Interfaces;
 using RaindropLobotomy.Buffs;
 
-namespace RaindropLobotomy.EGO.Merc {
-    public class YieldMyFlesh : CoolerBasicMeleeAttack {
+namespace RaindropLobotomy.EGO.Merc
+{
+    public class YieldMyFlesh : CoolerBasicMeleeAttack
+    {
         private float damageTaken = 0f;
 
         public override float BaseDuration => 1.6f;
@@ -29,7 +31,8 @@ namespace RaindropLobotomy.EGO.Merc {
 
             base.OnEnter();
 
-            if (NetworkServer.active) {
+            if (NetworkServer.active)
+            {
                 On.RoR2.HealthComponent.TakeDamageProcess += ReceiveDamage;
                 characterBody.AddBuff(Buffs.Unrelenting.Instance.Buff);
             }
@@ -41,14 +44,17 @@ namespace RaindropLobotomy.EGO.Merc {
 
         private void ReceiveDamage(On.RoR2.HealthComponent.orig_TakeDamageProcess orig, RoR2.HealthComponent self, RoR2.DamageInfo damageInfo)
         {
-            if (self == characterBody.healthComponent && !damageInfo.damageType.damageType.HasFlag(DamageType.FallDamage) && damageInfo.attacker) {
+            if (self == characterBody.healthComponent && !damageInfo.damageType.damageType.HasFlag(DamageType.FallDamage) && damageInfo.attacker)
+            {
                 damageTaken = damageInfo.damage;
                 attacker = damageInfo.attacker.transform;
 
-                if (base.isAuthority) {
+                if (base.isAuthority)
+                {
                     ReceiveInfo(attacker.gameObject, damageTaken);
                 }
-                else {
+                else
+                {
                     new SyncTCTB(base.gameObject, attacker.gameObject, damageTaken).Send(R2API.Networking.NetworkDestination.Clients);
                 }
             }
@@ -56,7 +62,8 @@ namespace RaindropLobotomy.EGO.Merc {
             orig(self, damageInfo);
         }
 
-        public void ReceiveInfo(GameObject attacker, float damageDealt) {
+        public void ReceiveInfo(GameObject attacker, float damageDealt)
+        {
             damageTaken = damageDealt;
             this.attacker = attacker.transform;
             Process();
@@ -65,7 +72,8 @@ namespace RaindropLobotomy.EGO.Merc {
         public override void OnExit()
         {
             base.OnExit();
-            if (NetworkServer.active) {
+            if (NetworkServer.active)
+            {
                 On.RoR2.HealthComponent.TakeDamageProcess -= ReceiveDamage;
             }
             characterBody.RemoveBuff(Buffs.Unrelenting.Instance.Buff);
@@ -76,13 +84,16 @@ namespace RaindropLobotomy.EGO.Merc {
             base.FixedUpdate();
         }
 
-        public void Process() {
-            if (damageTaken > 0f && attacker) {
+        public void Process()
+        {
+            if (damageTaken > 0f && attacker)
+            {
                 AkSoundEngine.PostEvent(Events.Play_merc_shift_slice, base.gameObject);
                 AkSoundEngine.PostEvent(Events.Play_merc_shift_slice, base.gameObject);
                 AkSoundEngine.PostEvent(Events.Play_merc_shift_slice, base.gameObject);
 
-                EffectManager.SpawnEffect(Paths.GameObject.MercExposeConsumeEffect, new EffectData {
+                EffectManager.SpawnEffect(Paths.GameObject.MercExposeConsumeEffect, new EffectData
+                {
                     origin = base.transform.position,
                     scale = 3f
                 }, false);
@@ -98,7 +109,8 @@ namespace RaindropLobotomy.EGO.Merc {
                 base.characterBody.SetBuffCount(Unrelenting.Instance.Buff.buffIndex, 0);
                 base.characterBody.SetBuffCount(RoR2Content.Buffs.HiddenInvincibility.buffIndex, 1);
 
-                if (base.isAuthority) {
+                if (base.isAuthority)
+                {
                     outer.SetNextState(new ToClaimTheirBones_Transition(0f, new ToClaimTheirBones_1(bonusDamage, attacker)));
                 }
             }

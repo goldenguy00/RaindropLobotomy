@@ -1,10 +1,11 @@
 using System;
 using RaindropLobotomy.Survivors.Sweeper;
 
-namespace RaindropLobotomy.Buffs {
+namespace RaindropLobotomy.Buffs
+{
     public class Persistence : BuffBase<Persistence>
     {
-        public override BuffDef Buff => Load<BuffDef>("bdPersistence.asset");
+        public override BuffDef Buff { get; set; } = Load<BuffDef>("bdPersistence.asset");
 
         public override void PostCreation()
         {
@@ -25,10 +26,12 @@ namespace RaindropLobotomy.Buffs {
         {
             orig(self, damageInfo, victim);
 
-            if (damageInfo.attacker && victim && victim.GetComponent<CharacterBody>()) {
-                CharacterBody attacker = damageInfo.attacker.GetComponent<CharacterBody>();
-                if (attacker && attacker.bodyIndex == Sweeper.SweeperIndex && attacker.HasBuff(Buff)) {
-                    Sweeper.ForceSweeperTargets(attacker.master, victim.GetComponent<CharacterBody>());
+            if (damageInfo.attacker && victim && victim.TryGetComponent<CharacterBody>(out var body))
+            {
+                var attacker = damageInfo.attacker.GetComponent<CharacterBody>();
+                if (attacker && attacker.bodyIndex == Sweeper.SweeperIndex && attacker.HasBuff(Buff))
+                {
+                    Sweeper.ForceSweeperTargets(attacker.master, body);
                 }
             }
         }
@@ -36,15 +39,16 @@ namespace RaindropLobotomy.Buffs {
         private void DamageNull(On.RoR2.HealthComponent.orig_TakeDamageProcess orig, HealthComponent self, DamageInfo damageInfo)
         {
             int persistenceCount = self.body.GetBuffCount(Buff);
-
-            if (persistenceCount > 0) {
+            if (persistenceCount > 0)
+            {
                 float current = self.health + self.shield + self.barrier;
                 float armor = self.body.armor;
                 float armorMult = ((armor >= 0f) ? (1f - armor / (armor + 100f)) : (2f - 100f / (100f - armor)));
 
                 float damage = damageInfo.damage * armorMult;
 
-                if ((current - damage) <= 0f) {
+                if ((current - damage) <= 0f)
+                {
                     damageInfo.rejected = true;
 
                     EffectData effectData3 = new EffectData
@@ -54,7 +58,7 @@ namespace RaindropLobotomy.Buffs {
                     };
                     EffectManager.SpawnEffect(HealthComponent.AssetReferences.captainBodyArmorBlockEffectPrefab, effectData3, transmit: true);
 
-                    self.body.SetBuffCount(Buff.buffIndex, persistenceCount - 1);
+                    self.body.SetBuffCount(Persistence.Instance.Buff.buffIndex, persistenceCount - 1);
                 }
             }
 
@@ -64,8 +68,8 @@ namespace RaindropLobotomy.Buffs {
         private void AddPersistanceBuffs(CharacterBody sender, StatHookEventArgs args)
         {
             int persistenceCount = sender.GetBuffCount(Buff);
-
-            if (persistenceCount > 0) {
+            if (persistenceCount > 0)
+            {
                 float atkSpeed = 0.1f * persistenceCount;
                 float armor = persistenceCount * 20;
                 float moveSpeed = 0.05f * persistenceCount;

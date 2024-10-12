@@ -1,13 +1,15 @@
 using System;
 
-namespace RaindropLobotomy.EGO.Merc {
-    public class Flurry : BaseSkillState {
+namespace RaindropLobotomy.EGO.Merc
+{
+    public class Flurry : BaseSkillState
+    {
         public OverlapAttack attack;
         public bool hasFired = false;
         public Vector3 forwardLock;
         public LineRenderer chargeRenderer;
         public bool hasHitTarget = false;
-        
+
         public override void OnEnter()
         {
             base.OnEnter();
@@ -28,7 +30,8 @@ namespace RaindropLobotomy.EGO.Merc {
         {
             base.FixedUpdate();
 
-            if (!hasFired) {
+            if (!hasFired)
+            {
                 base.StartAimMode(0.2f);
 
                 base.rigidbody.velocity = Vector3.zero;
@@ -39,32 +42,38 @@ namespace RaindropLobotomy.EGO.Merc {
 
                 Vector3 endPos = base.GetAimRay().GetPoint(90f);
 
-                if (Physics.Raycast(base.transform.position, base.GetAimRay().direction, out RaycastHit info, 400f, LayerIndex.world.mask)) {
+                if (Physics.Raycast(base.transform.position, base.GetAimRay().direction, out RaycastHit info, 400f, LayerIndex.world.mask))
+                {
                     endPos = info.point;
                 }
 
                 chargeRenderer.SetPosition(0, chargeRenderer.transform.position);
                 chargeRenderer.SetPosition(1, endPos);
 
-                if (base.fixedAge >= 1f) {
+                if (base.fixedAge >= 1f)
+                {
                     hasFired = true;
 
                     forwardLock = base.GetAimRay().direction;
-                    
+
                     Destroy(chargeRenderer.gameObject);
                     base.fixedAge = 0f;
                 }
             }
-            else {
+            else
+            {
 
                 base.rigidbody.rotation = Util.QuaternionSafeLookRotation(forwardLock);
 
-                if (!hasHitTarget) {
+                if (!hasHitTarget)
+                {
                     bool temp = attack.Fire();
-                    if (temp) {
+                    if (temp)
+                    {
                         hasHitTarget = temp;
                         base.rigidbody.velocity = Vector3.zero;
-                        EffectManager.SpawnEffect(Paths.GameObject.HermitCrabBombExplosion, new EffectData {
+                        EffectManager.SpawnEffect(Paths.GameObject.HermitCrabBombExplosion, new EffectData
+                        {
                             origin = base.transform.position,
                             scale = 5f
                         }, false);
@@ -73,7 +82,8 @@ namespace RaindropLobotomy.EGO.Merc {
 
                 base.rigidbody.velocity = forwardLock * 90f;
 
-                if (base.fixedAge >= 0.5f) {
+                if (base.fixedAge >= 0.5f)
+                {
                     outer.SetNextStateToMain();
                 }
             }

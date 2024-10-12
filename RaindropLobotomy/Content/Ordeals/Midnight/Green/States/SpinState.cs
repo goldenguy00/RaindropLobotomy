@@ -1,7 +1,9 @@
 using System;
 
-namespace RaindropLobotomy.Ordeals.Midnight.Green {
-    public class SpinState : BaseHelixWeapon {
+namespace RaindropLobotomy.Ordeals.Midnight.Green
+{
+    public class SpinState : BaseHelixWeapon
+    {
         public Transform endPoint1;
         public Transform endPoint2;
         public GameObject laserInst1;
@@ -24,7 +26,7 @@ namespace RaindropLobotomy.Ordeals.Midnight.Green {
         public override void OnEnter()
         {
             base.OnEnter();
-            
+
             endPoint1 = InitializeLazer(muzzleL, out laserInst1);
             endPoint2 = InitializeLazer(muzzleR, out laserInst2);
 
@@ -44,11 +46,16 @@ namespace RaindropLobotomy.Ordeals.Midnight.Green {
         public override void FixedUpdate()
         {
             base.FixedUpdate();
-
+            if (!this.characterBody || !this.healthComponent || !this.healthComponent.alive)
+            {
+                this.outer.SetNextStateToMain();
+                return;
+            }
             endPoint2.transform.position = new Ray(muzzleR.transform.position, -muzzleR.right).GetPoint(5000);
             endPoint1.transform.position = new Ray(muzzleL.transform.position, -muzzleL.right).GetPoint(5000);
 
-            if (!chargeUpTimer.Tick()) {
+            if (!chargeUpTimer.Tick())
+            {
                 float width = targetBeamWidth * mult;
                 beam.startWidth = width;
                 beam.endWidth = width;
@@ -59,7 +66,8 @@ namespace RaindropLobotomy.Ordeals.Midnight.Green {
                 return;
             }
 
-            if (bulletTimer.Tick() && NetworkServer.active) {
+            if (bulletTimer.Tick() && NetworkServer.active)
+            {
                 GetBulletAttack(muzzleL, -muzzleL.right, base.damageStat * damageCoeff, 3f).Fire();
                 GetBulletAttack(muzzleR, -muzzleR.right, base.damageStat * damageCoeff, 3f).Fire();
             }

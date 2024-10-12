@@ -1,7 +1,8 @@
 using System;
 using UnityEngine.SceneManagement;
 
-namespace RaindropLobotomy.EGO.Gifts {
+namespace RaindropLobotomy.EGO.Gifts
+{
     public class ClockworkSpring : EGOGiftBase<ClockworkSpring>
     {
         public override ItemDef ItemDef => null;
@@ -17,16 +18,19 @@ namespace RaindropLobotomy.EGO.Gifts {
         {
             AccumulatedPast past = sender.GetComponent<AccumulatedPast>();
 
-            if (past && past.dumpingPast) {
+            if (past && past.dumpingPast)
+            {
                 args.attackSpeedMultAdd += 1f;
                 args.cooldownMultAdd *= 0.5f;
                 args.moveSpeedMultAdd += 1f;
             }
 
-            if (sender.inventory && sender.inventory.currentEquipmentIndex == EquipmentDef.equipmentIndex) {
+            if (sender.inventory && sender.inventory.currentEquipmentIndex == EquipmentDef.equipmentIndex)
+            {
                 sender.AddItemBehavior<AccumulatedPast>(1);
             }
-            else if (sender.inventory) {
+            else if (sender.inventory)
+            {
                 sender.SetBuffCount(Buffs.AccumulatedPast.Instance.Buff.buffIndex, 0);
                 sender.AddItemBehavior<AccumulatedPast>(0);
             }
@@ -46,32 +50,40 @@ namespace RaindropLobotomy.EGO.Gifts {
         }
     }
 
-    public class AccumulatedPast : CharacterBody.ItemBehavior {
+    public class AccumulatedPast : CharacterBody.ItemBehavior
+    {
         public float storedPast = 0f;
         public bool dumpingPast = false;
         private bool allowThisStage = true;
-        public void Start() {
+        public void Start()
+        {
             allowThisStage = SceneCatalog.mostRecentSceneDef.sceneType != SceneType.Intermission;
         }
-        public void FixedUpdate() {
-            if (body.GetBuffCount(Buffs.AccumulatedPast.Instance.Buff) != Mathf.RoundToInt(storedPast)) {
+        public void FixedUpdate()
+        {
+            if (body.GetBuffCount(Buffs.AccumulatedPast.Instance.Buff) != Mathf.RoundToInt(storedPast))
+            {
                 body.SetBuffCount(Buffs.AccumulatedPast.Instance.Buff.buffIndex, Mathf.RoundToInt(storedPast));
             }
 
-            if (!dumpingPast && allowThisStage) {
+            if (!dumpingPast && allowThisStage)
+            {
                 storedPast += Time.fixedDeltaTime;
             }
-            else {
+            else
+            {
                 storedPast -= Time.fixedDeltaTime * 5f;
 
-                if (storedPast <= 0f) {
+                if (storedPast <= 0f)
+                {
                     dumpingPast = false;
                     storedPast = 0f;
                 }
             }
         }
 
-        public void DumpPast() {
+        public void DumpPast()
+        {
             dumpingPast = true;
             body.statsDirty = true;
         }

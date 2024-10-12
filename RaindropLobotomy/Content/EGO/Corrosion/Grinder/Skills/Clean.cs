@@ -1,7 +1,8 @@
 using System;
 using RaindropLobotomy.EGO.Viend;
 
-namespace RaindropLobotomy.EGO.Toolbot {
+namespace RaindropLobotomy.EGO.Toolbot
+{
     public class Clean : CoolerBasicMeleeAttack
     {
         public override float BaseDuration => 0.5f;
@@ -40,7 +41,8 @@ namespace RaindropLobotomy.EGO.Toolbot {
         {
             if (animBlades) animator = animBlades;
 
-            if (animBlades && timer.Tick() && resetCount < 4 && animBlades.GetFloat(MechanimHitboxParameter) >= 0.5f) {
+            if (animBlades && timer.Tick() && resetCount < 4 && animBlades.GetFloat(MechanimHitboxParameter) >= 0.5f)
+            {
                 resetCount++;
                 overlapAttack.ResetIgnoredHealthComponents();
             }

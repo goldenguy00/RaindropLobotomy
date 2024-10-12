@@ -1,10 +1,11 @@
 using System;
 using RaindropLobotomy.EGO.Merc;
 
-namespace RaindropLobotomy.Buffs {
+namespace RaindropLobotomy.Buffs
+{
     public class PrescriptEnergized : BuffBase<PrescriptEnergized>
     {
-        public override BuffDef Buff => Load<BuffDef>("bdPrescriptEnergized.asset");
+        public override BuffDef Buff { get; set; } = Load<BuffDef>("bdPrescriptEnergized.asset");
 
         public override void PostCreation()
         {
@@ -17,13 +18,17 @@ namespace RaindropLobotomy.Buffs {
         {
             orig(self, buffDef, duration);
 
-            if (buffDef == Buff && self.skillLocator) {
-                foreach (GenericSkill slot in self.skillLocator.allSkills) {
-                    if (slot == self.skillLocator.special && (self.bodyIndex == IndexMerc.IndexMercBody || self.bodyIndex == IndexMerc.IndexPaladinBody)) {
+            if (buffDef == Buff && self.skillLocator)
+            {
+                foreach (GenericSkill slot in self.skillLocator.allSkills)
+                {
+                    if (slot == self.skillLocator.special && (self.bodyIndex == IndexMerc.IndexMercBody || self.bodyIndex == IndexMerc.IndexPaladinBody))
+                    {
                         continue;
                     }
 
-                    if (!slot.CanApplyAmmoPack()) {
+                    if (!slot.CanApplyAmmoPack())
+                    {
                         continue;
                     }
 
@@ -34,7 +39,8 @@ namespace RaindropLobotomy.Buffs {
 
         private void SetBonusStock(On.RoR2.GenericSkill.orig_SetBonusStockFromBody orig, GenericSkill self, int newBonusStockFromBody)
         {
-            if (self.characterBody.HasBuff(Buff)) {
+            if (self.characterBody.HasBuff(Buff))
+            {
                 newBonusStockFromBody += 1;
             }
 
@@ -43,7 +49,8 @@ namespace RaindropLobotomy.Buffs {
 
         private void IncreaseStats(CharacterBody sender, StatHookEventArgs args)
         {
-            if (sender.HasBuff(Buff)) {
+            if (sender.HasBuff(Buff))
+            {
                 float mult = sender.bodyIndex == IndexMerc.IndexGiantFistBody ? 2f : 1f;
                 args.cooldownMultAdd -= 0.50f * mult;
             }

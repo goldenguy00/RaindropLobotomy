@@ -27,7 +27,8 @@ namespace RaindropLobotomy.Ordeals.Midnight.Green
 
         public override void OnSpawnOrdeal(RoR2.Stage stage)
         {
-            if (!TeleporterInteraction.instance) {
+            if (!TeleporterInteraction.instance)
+            {
                 return;
             }
 

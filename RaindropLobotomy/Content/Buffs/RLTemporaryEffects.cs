@@ -1,14 +1,18 @@
 using System;
 using RaindropLobotomy.Buffs;
 
-namespace RaindropLobotomy {
-    public class RLTemporaryEffects : MonoBehaviour {
+namespace RaindropLobotomy
+{
+    public class RLTemporaryEffects : MonoBehaviour
+    {
         public TemporaryVisualEffect FeatherShield;
-        public void UpdateTemporaryEffects(CharacterBody body) {
+        public void UpdateTemporaryEffects(CharacterBody body)
+        {
             body.UpdateSingleTemporaryVisualEffect(ref FeatherShield, FeatherGuard.FeatherShieldEffect, body.bestFitActualRadius / 2f, body.HasBuff(FeatherGuard.BuffIndex), "Pelvis");
         }
 
-        internal static void ApplyHooks() {
+        internal static void ApplyHooks()
+        {
             On.RoR2.CharacterBody.UpdateAllTemporaryVisualEffects += OnUpdateVisualEffects;
         }
 

@@ -29,11 +29,12 @@ namespace RaindropLobotomy.Buffs
 
     public abstract class BuffBase
     {
-        public abstract BuffDef Buff { get; }
+        public abstract BuffDef Buff { get; set; }
 
         public abstract void PostCreation();
-        
-        public void Create() {
+
+        public void Create()
+        {
             ContentAddition.AddBuffDef(Buff);
             PostCreation();
         }

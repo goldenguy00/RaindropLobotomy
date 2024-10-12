@@ -1,7 +1,9 @@
 using System;
 
-namespace RaindropLobotomy.EGO.Merc {
-    public class Lock : BaseSkillState {
+namespace RaindropLobotomy.EGO.Merc
+{
+    public class Lock : BaseSkillState
+    {
         public bool paladinInstalled => base.characterBody.bodyIndex == IndexMerc.IndexPaladinBody;
         public float damageCoefficientBase = 2.5f;
         public override void OnEnter()
@@ -17,17 +19,20 @@ namespace RaindropLobotomy.EGO.Merc {
             info.position = base.inputBank.aimOrigin;
             info.owner = base.gameObject;
 
-            if (base.isAuthority) {
+            if (base.isAuthority)
+            {
                 ProjectileManager.instance.FireProjectile(info);
             }
 
             outer.SetNextStateToMain();
 
-            if (paladinInstalled) {
+            if (paladinInstalled)
+            {
                 PlayAnimation("Gesture, Override", "ThrowSpell", "ChargeSpell.playbackRate", 0.8f);
             }
-            else {
-                
+            else
+            {
+
             }
         }
 

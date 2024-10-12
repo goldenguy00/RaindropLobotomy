@@ -1,7 +1,9 @@
 using System;
 
-namespace RaindropLobotomy.EGO.Viend {
-    public class Hello : BaseSkillState {
+namespace RaindropLobotomy.EGO.Viend
+{
+    public class Hello : BaseSkillState
+    {
         public static float DamageCoefficient = 3.25f;
         public static float BaseDuration = 0.6f;
 
@@ -19,7 +21,7 @@ namespace RaindropLobotomy.EGO.Viend {
 
             AddRecoil(-1f, -2f, -0.5f, 0.5f);
             StartAimMode(aimRay);
-            
+
             /*if (Util.CheckRoll(10f, 0)) {
                 AkSoundEngine.PostEvent("Play_NT_hello", base.gameObject);
             }*/
@@ -28,7 +30,7 @@ namespace RaindropLobotomy.EGO.Viend {
             AkSoundEngine.PostEvent(Events.Play_lunar_exploder_m1_fire, base.gameObject);
 
             EffectManager.SimpleMuzzleFlash(Paths.GameObject.Muzzleflash1, base.gameObject, "MuzzleHandBeam", transmit: false);
-            
+
             if (base.isAuthority)
             {
                 BulletAttack bulletAttack = new();
@@ -49,10 +51,10 @@ namespace RaindropLobotomy.EGO.Viend {
                 bulletAttack.isCrit = Util.CheckRoll(critStat, base.characterBody.master);
                 bulletAttack.tracerEffectPrefab = EGOMimicry.TracerHello;
                 bulletAttack.hitEffectPrefab = Paths.GameObject.OmniImpactVFXHuntress;
-                
+
                 bulletAttack.Fire();
             }
-            
+
             base.characterBody.AddSpreadBloom(0.2f);
         }
 
@@ -60,7 +62,8 @@ namespace RaindropLobotomy.EGO.Viend {
         {
             base.FixedUpdate();
 
-            if (base.fixedAge >= duration) {
+            if (base.fixedAge >= duration)
+            {
                 outer.SetNextStateToMain();
             }
         }

@@ -28,19 +28,21 @@ namespace RaindropLobotomy.EGO
 
     public abstract class EGOSkillBase
     {
-        public abstract SkillDef SkillDef { get; }
-        public abstract SurvivorDef Survivor { get; }
-        public abstract SkillSlot Slot { get; }
-        public abstract UnlockableDef Unlock { get; }
+        public abstract SkillDef SkillDef { get; set; }
+        public abstract SurvivorDef Survivor { get; set; }
+        public abstract SkillSlot Slot { get; set; }
+        public abstract UnlockableDef Unlock { get; set; }
         private static bool setHooks = false;
 
         public abstract void OnSkillChangeUpdate(CharacterModel model, bool equipped);
 
-        public virtual void CreateLanguage() {
+        public virtual void CreateLanguage()
+        {
 
         }
 
-        public void Create() {
+        public void Create()
+        {
             CreateLanguage();
             ContentAddition.AddSkillDef(SkillDef);
 
@@ -49,7 +51,8 @@ namespace RaindropLobotomy.EGO
 
             SkillFamily family = null;
 
-            switch (Slot) {
+            switch (Slot)
+            {
                 case SkillSlot.Primary:
                     family = skillLocator.primary.skillFamily;
                     break;
@@ -66,10 +69,12 @@ namespace RaindropLobotomy.EGO
                     break;
             }
 
-            if (family != null) {
+            if (family != null)
+            {
                 Array.Resize(ref family.variants, family.variants.Length + 1);
-                    
-                family.variants[family.variants.Length - 1] = new SkillFamily.Variant {
+
+                family.variants[family.variants.Length - 1] = new SkillFamily.Variant
+                {
                     skillDef = SkillDef,
                     unlockableDef = Unlock,
                     viewableNode = new ViewablesCatalog.Node(SkillDef.skillNameToken, false, null)
@@ -84,11 +89,13 @@ namespace RaindropLobotomy.EGO
 
             NetworkUser.onLoadoutChangedGlobal += OnLoadoutChanged;
 
-            RendererStore.init += (s, e) => {
+            RendererStore.init += (s, e) =>
+            {
                 OnLoadoutChanged(LocalUserManager.GetFirstLocalUser().currentNetworkUser);
             };
 
-            if (!setHooks) {
+            if (!setHooks)
+            {
                 setHooks = true;
                 IL.RoR2.SkinDef.RuntimeSkin.Apply += DontOverwrite;
             }
@@ -98,11 +105,12 @@ namespace RaindropLobotomy.EGO
         {
             ILCursor c = new(il);
 
-            bool found = c.TryGotoNext(MoveType.Before, 
+            bool found = c.TryGotoNext(MoveType.Before,
                 x => x.MatchStfld(typeof(CharacterModel), nameof(CharacterModel.baseRendererInfos))
             );
 
-            if (found) {
+            if (found)
+            {
                 c.Index -= 3;
                 c.RemoveRange(4);
                 c.Emit(OpCodes.Nop);
@@ -111,42 +119,53 @@ namespace RaindropLobotomy.EGO
                 c.Emit(OpCodes.Nop);
                 c.Emit(OpCodes.Ldarg_0);
                 c.Emit(OpCodes.Ldarg_1);
-                c.EmitDelegate<Action<SkinDef.RuntimeSkin, GameObject>>((skin, obj) => {
+                c.EmitDelegate<Action<SkinDef.RuntimeSkin, GameObject>>((skin, obj) =>
+                {
                     RendererStore store = obj.GetComponent<RendererStore>();
                     CharacterModel model = obj.GetComponent<CharacterModel>();
-                    
-                    for (int i = 0; i < SkinDef.RuntimeSkin.rendererInfoBuffer.Count; i++) {
+
+                    for (int i = 0; i < SkinDef.RuntimeSkin.rendererInfoBuffer.Count; i++)
+                    {
                         bool disallow = false;
 
-                        if (store != null) {
-                            for (int j = 0; j < store.noUpdateIndices.Length; j++) {
+                        if (store != null)
+                        {
+                            for (int j = 0; j < store.noUpdateIndices.Length; j++)
+                            {
                                 int index = store.noUpdateIndices[j];
-                                if (i == index) {
+                                if (i == index)
+                                {
                                     disallow = true;
                                     break;
                                 }
                             }
                         }
 
-                        if (!disallow && i < model.baseRendererInfos.Length) {
+                        if (!disallow && i < model.baseRendererInfos.Length)
+                        {
                             model.baseRendererInfos[i] = SkinDef.RuntimeSkin.rendererInfoBuffer[i];
                         }
                     }
                 });
             }
-            else {
+            else
+            {
                 // Debug.Log("Failed to match for ego IL hook.");
             }
         }
 
-        public void OnLoadoutChanged(NetworkUser user) {
+        public void OnLoadoutChanged(NetworkUser user)
+        {
             Loadout loadout = Loadout.RequestInstance();
             user.networkLoadout.CopyLoadout(loadout);
 
-            if (user.GetSurvivorPreference() == Survivor) {
+            if (user.GetSurvivorPreference() == Survivor)
+            {
                 BodyIndex index = BodyCatalog.FindBodyIndex(Survivor.bodyPrefab);
-                foreach (RendererStore store in GameObject.FindObjectsOfType<RendererStore>()) {
-                    if (store.targetSkill == SkillDef) {
+                foreach (RendererStore store in GameObject.FindObjectsOfType<RendererStore>())
+                {
+                    if (store.targetSkill == SkillDef)
+                    {
                         OnSkillChangeUpdate(store.GetComponent<CharacterModel>(), HasSkillVariantEnabled(loadout, index, Slot, SkillDef));
                     }
                 }
@@ -160,7 +179,8 @@ namespace RaindropLobotomy.EGO
 
             SkillFamily family = null;
 
-            switch (slot) {
+            switch (slot)
+            {
                 case SkillSlot.Primary:
                     family = skillLocator.primary.skillFamily;
                     break;
@@ -186,7 +206,8 @@ namespace RaindropLobotomy.EGO
             return loadout.bodyLoadoutManager.GetSkillVariant(bodyIndex, num) == num2;
         }
 
-        private static int FindSlotIndex(BodyIndex bodyIndex, SkillFamily skillFamily) {
+        private static int FindSlotIndex(BodyIndex bodyIndex, SkillFamily skillFamily)
+        {
             GenericSkill[] bodyPrefabSkillSlots = BodyCatalog.GetBodyPrefabSkillSlots(bodyIndex);
             for (int i = 0; i < bodyPrefabSkillSlots.Length; i++)
             {
@@ -211,9 +232,11 @@ namespace RaindropLobotomy.EGO
             return -1;
         }
 
-        public RendererStore GetRendererStore(CharacterModel model) {
+        public RendererStore GetRendererStore(CharacterModel model)
+        {
             RendererStore store = model.GetComponent<RendererStore>();
-            if (!store) {
+            if (!store)
+            {
                 store = model.AddComponent<RendererStore>();
                 store.targetSkill = SkillDef;
             }
@@ -221,20 +244,25 @@ namespace RaindropLobotomy.EGO
             return store;
         }
 
-        public void FillStore(RendererStore store, CharacterModel model) {
-            for (int i = 0; i < model.baseRendererInfos.Length; i++) {
+        public void FillStore(RendererStore store, CharacterModel model)
+        {
+            for (int i = 0; i < model.baseRendererInfos.Length; i++)
+            {
                 CharacterModel.RendererInfo rendInfo = model.baseRendererInfos[i];
                 RendererStore.Info info = store[i];
                 info.mat = rendInfo.defaultMaterial;
-                
-                if (rendInfo.renderer is SkinnedMeshRenderer) {
+
+                if (rendInfo.renderer is SkinnedMeshRenderer)
+                {
                     info.mesh = (rendInfo.renderer as SkinnedMeshRenderer).sharedMesh;
                 }
-                else if (rendInfo.renderer is MeshRenderer) {
+                else if (rendInfo.renderer is MeshRenderer)
+                {
                     info.mesh = rendInfo.renderer.GetComponent<MeshFilter>().mesh;
                 }
 
-                if (info.mesh) {
+                if (info.mesh)
+                {
                     // Debug.Log("set info mesh to: " + info.mesh);
                     info.rotation = rendInfo.renderer.transform.localRotation;
                     info.scale = rendInfo.renderer.transform.localScale;
@@ -242,16 +270,19 @@ namespace RaindropLobotomy.EGO
             }
         }
 
-        public void ReloadFromStore(CharacterModel.RendererInfo info, RendererStore.Info store) {
+        public void ReloadFromStore(CharacterModel.RendererInfo info, RendererStore.Info store)
+        {
             info.defaultMaterial = store.mat;
             info.renderer.material = store.mat;
 
             // Debug.Log("store mesh: " + store.mesh);
-            
-            if (info.renderer is SkinnedMeshRenderer) {
+
+            if (info.renderer is SkinnedMeshRenderer)
+            {
                 (info.renderer as SkinnedMeshRenderer).sharedMesh = store.mesh;
             }
-            else if (info.renderer is MeshRenderer) {
+            else if (info.renderer is MeshRenderer)
+            {
                 info.renderer.GetComponent<MeshFilter>().sharedMesh = store.mesh;
             }
 
@@ -262,8 +293,10 @@ namespace RaindropLobotomy.EGO
         public abstract void SetupRendererStore(RendererStore store, CharacterModel model);
     }
 
-    public class RendererStore : MonoBehaviour {
-        public class Info {
+    public class RendererStore : MonoBehaviour
+    {
+        public class Info
+        {
             public Mesh mesh;
             public Material mat;
             public Quaternion rotation;
@@ -274,26 +307,31 @@ namespace RaindropLobotomy.EGO
         public SkillDef targetSkill;
         public int[] noUpdateIndices = new int[0];
 
-        private List<Info> infos = new();
+        private List<Info> infos = [];
 
         public static event EventHandler init;
 
-        public void OnEnable() {
+        public void OnEnable()
+        {
             FillStore(this, GetComponent<CharacterModel>());
-            
+
             init?.Invoke(null, null);
         }
 
-        public void FillStore(RendererStore store, CharacterModel model) {
-            for (int i = 0; i < model.baseRendererInfos.Length; i++) {
+        public void FillStore(RendererStore store, CharacterModel model)
+        {
+            for (int i = 0; i < model.baseRendererInfos.Length; i++)
+            {
                 CharacterModel.RendererInfo rendInfo = model.baseRendererInfos[i];
                 RendererStore.Info info = store[i];
                 info.mat = rendInfo.defaultMaterial;
-                
-                if (rendInfo.renderer is SkinnedMeshRenderer) {
+
+                if (rendInfo.renderer is SkinnedMeshRenderer)
+                {
                     info.mesh = (rendInfo.renderer as SkinnedMeshRenderer).sharedMesh;
                 }
-                else if (rendInfo.renderer is MeshRenderer) {
+                else if (rendInfo.renderer is MeshRenderer)
+                {
                     info.mesh = rendInfo.renderer.GetComponent<MeshFilter>().mesh;
                 }
 
@@ -304,10 +342,13 @@ namespace RaindropLobotomy.EGO
             }
         }
 
-        public Info this[int index] {
-            get {
+        public Info this[int index]
+        {
+            get
+            {
                 Info info = infos.FirstOrDefault(x => x.index == index);
-                if (info == null) {
+                if (info == null)
+                {
                     info = new();
                     info.index = index;
                     infos.Add(info);

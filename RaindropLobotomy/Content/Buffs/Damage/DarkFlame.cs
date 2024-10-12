@@ -5,10 +5,11 @@ using RoR2.UI;
 using R2API;
 using HarmonyLib;
 
-namespace RaindropLobotomy.Buffs {
+namespace RaindropLobotomy.Buffs
+{
     public class DarkFlame : BuffBase<DarkFlame>
     {
-        public override BuffDef Buff => Load<BuffDef>("bdDarkFlame.asset");
+        public override BuffDef Buff { get; set; } = Load<BuffDef>("bdDarkFlame.asset");
         public DamageAPI.ModdedDamageType DarkFlameDamageType = DamageAPI.ReserveDamageType();
         public DotController.DotDef DarkFlameDOT;
         public BurnEffectController.EffectParams DarkFlameEffect;
@@ -31,7 +32,7 @@ namespace RaindropLobotomy.Buffs {
             DarkFlameEffect.fireEffectPrefab = Paths.GameObject.HelfireEffect;
             DarkFlameEffect.overlayMaterial = Paths.Material.matOnHelfire;
             DarkFlameEffect.startSound = "Play_item_proc_igniteOnKill_Loop";
-			DarkFlameEffect.stopSound = "Stop_item_proc_igniteOnKill_Loop";
+            DarkFlameEffect.stopSound = "Stop_item_proc_igniteOnKill_Loop";
 
             On.RoR2.GlobalEventManager.OnHitEnemy += InflictDarkFlame;
             RecalculateStatsAPI.GetStatCoefficients += DarkFlameArmorReduction;
@@ -39,7 +40,8 @@ namespace RaindropLobotomy.Buffs {
 
         private void DarkFlameArmorReduction(CharacterBody sender, StatHookEventArgs args)
         {
-            if (sender.HasBuff(Buff)) {
+            if (sender.HasBuff(Buff))
+            {
                 args.armorAdd -= 60 * sender.GetBuffCount(Buff);
             }
         }
@@ -48,7 +50,8 @@ namespace RaindropLobotomy.Buffs {
         {
             orig(self, damageInfo, victim);
 
-            if (damageInfo.attacker && damageInfo.HasModdedDamageType(DarkFlameDamageType)) {
+            if (damageInfo.attacker && damageInfo.HasModdedDamageType(DarkFlameDamageType))
+            {
                 InflictDotInfo info = new();
                 info.damageMultiplier = 1f;
                 info.totalDamage = damageInfo.attacker.GetComponent<CharacterBody>().damage * 15f;
@@ -66,13 +69,16 @@ namespace RaindropLobotomy.Buffs {
         {
             orig(self, buffType);
 
-            if (buffType == Buff.buffIndex) {
+            if (buffType == Buff.buffIndex)
+            {
                 CharacterModel model = self.modelLocator?.modelTransform?.GetComponent<CharacterModel>() ?? null;
 
-                if (model) {
+                if (model)
+                {
                     DarkFlameController controller = model.GetComponent<DarkFlameController>();
 
-                    if (!controller) {
+                    if (!controller)
+                    {
                         controller = model.AddComponent<DarkFlameController>();
                     }
 
@@ -83,11 +89,14 @@ namespace RaindropLobotomy.Buffs {
             }
         }
 
-        private class DarkFlameController : BurnEffectController {
+        private class DarkFlameController : BurnEffectController
+        {
             internal CharacterBody body;
 
-            public void FixedUpdate() {
-                if (!body.HasBuff(DarkFlame.Instance.Buff)) {
+            public void FixedUpdate()
+            {
+                if (!body.HasBuff(DarkFlame.Instance.Buff))
+                {
                     Destroy(this);
                 }
             }

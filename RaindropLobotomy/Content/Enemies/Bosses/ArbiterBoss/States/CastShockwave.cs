@@ -11,8 +11,10 @@ using HarmonyLib;
 using RoR2.CharacterAI;
 using System.Collections;
 
-namespace RaindropLobotomy.Enemies.ArbiterBoss {
-    public class CastShockwave : BaseSkillState {
+namespace RaindropLobotomy.Enemies.ArbiterBoss
+{
+    public class CastShockwave : BaseSkillState
+    {
         public static float DamageCoefficient = 20f;
         public static int HitCount = 3;
         public static float HitDelay = 0.75f;
@@ -34,7 +36,7 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
         public override void OnEnter()
         {
             base.OnEnter();
-            
+
             animator = GetModelAnimator();
             animator.SetBool("isInShockwave", true);
             PlayAnimation("Gesture, Override", "CastShockwave", "CastShockwave.playbackRate", attackBegin.duration);
@@ -55,30 +57,36 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
             characterMotor.moveDirection = Vector3.zero;
             characterDirection.forward = forward;
 
-            if (!attackBegin.Tick()) {
-                chargeEffect.transform.localPosition += new Vector3(0f, 0f, (3f / attackBegin.duration ) * Time.fixedDeltaTime);
+            if (!attackBegin.Tick())
+            {
+                chargeEffect.transform.localPosition += new Vector3(0f, 0f, (3f / attackBegin.duration) * Time.fixedDeltaTime);
                 chargeEffect.transform.localScale += (ChargeRad / attackBegin.duration) * Time.fixedDeltaTime;
                 return;
             }
 
             characterMotor.velocity = Vector3.zero;
 
-            if (currentTelegraphFX) {
+            if (currentTelegraphFX)
+            {
                 currentTelegraphFX.transform.localScale += (TeleRad * 2f / HitDelay) * Time.fixedDeltaTime;
             }
 
-            if (!begunShockwaves) {
+            if (!begunShockwaves)
+            {
                 begunShockwaves = true;
                 base.characterBody.StartCoroutine(PerformShockwaves());
             }
         }
 
-        public IEnumerator PerformShockwaves() {
-            for (int i = 0; i < HitCount; i++) {
+        public IEnumerator PerformShockwaves()
+        {
+            for (int i = 0; i < HitCount; i++)
+            {
                 currentTelegraphFX = GameObject.Instantiate(TelegraphPrefab, chargeEffect.transform.position, Quaternion.identity);
                 yield return new WaitForSeconds(HitDelay);
                 ProcessHit();
-                if (i == HitCount - 1) {
+                if (i == HitCount - 1)
+                {
                     chargeEffect.gameObject.SetActive(false);
                 }
                 yield return new WaitForSeconds(HitDelay / 3f + 0.3f);
@@ -89,9 +97,10 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
             yield return null;
         }
 
-        public void ProcessHit() {
+        public void ProcessHit()
+        {
             GameObject.Destroy(currentTelegraphFX);
-            
+
             GameObject shockwave = GameObject.Instantiate(ShockwaveEffectPrefab, chargeEffect.transform.position, Quaternion.identity);
             shockwave.transform.localScale = new(30f, 30f, 30f);
 
@@ -108,7 +117,7 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
             attack.teamIndex = base.GetTeam();
             attack.damageType = DamageType.WeakOnHit; // maybe add proper feeble?
             attack.baseForce = 400f;
-            
+
             attack.Fire();
 
             AkSoundEngine.PostEvent(Events.Play_moonBrother_phaseJump_shockwave_single, base.gameObject);
@@ -116,8 +125,10 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
 
             base.characterBody.AddTimedBuff(RoR2Content.Buffs.SmallArmorBoost, 10f);
 
-            foreach (CharacterBody body in CharacterBody.readOnlyInstancesList) {
-                if (body != characterBody && IsValidForProtection(body)) {
+            foreach (CharacterBody body in CharacterBody.readOnlyInstancesList)
+            {
+                if (body != characterBody && IsValidForProtection(body))
+                {
                     body.AddTimedBuff(RoR2Content.Buffs.SmallArmorBoost, 10f);
                 }
             }
@@ -129,7 +140,8 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
         }
 
         // TODO: make this only return false for red mist boss whenever i get around to that
-        private bool IsValidForProtection(CharacterBody body) {
+        private bool IsValidForProtection(CharacterBody body)
+        {
             return !TeamManager.IsTeamEnemy(base.GetTeam(), body.teamComponent.teamIndex);
         }
 

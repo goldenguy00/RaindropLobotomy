@@ -11,8 +11,10 @@ using HarmonyLib;
 using RoR2.CharacterAI;
 using System.Collections;
 
-namespace RaindropLobotomy.Enemies.ArbiterBoss {
-    public class CastPillar : BaseSkillState {
+namespace RaindropLobotomy.Enemies.ArbiterBoss
+{
+    public class CastPillar : BaseSkillState
+    {
         public static string MuzzleName = "MuzzleHand";
         public static float DamageCoefficient = 8f;
         //
@@ -23,9 +25,9 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
         public override void OnEnter()
         {
             base.OnEnter();
-    
+
             // Debug.Log("playing fairy anim");
-            
+
             GetModelAnimator().SetBool("isInShockwave", true);
             PlayAnimation("Gesture, Override", "CastShockwave", "CastShockwave.playbackRate", 3f);
 
@@ -52,11 +54,13 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
 
             base.characterMotor.moveDirection = Vector3.zero;
 
-            if (!spawnPillar.expired) {
+            if (!spawnPillar.expired)
+            {
                 base.characterDirection.forward = forward;
             }
 
-            if (spawnPillar.Tick()) {
+            if (spawnPillar.Tick())
+            {
                 GameObject.Instantiate(ArbiterBoss.FairyMuzzleFlash, FindModelChild("MuzzleHand"));
 
                 FireProjectileInfo info = new();
@@ -65,11 +69,12 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
 
                 target = base.characterBody.master.aiComponents[0].currentEnemy.gameObject?.transform;
 
-                if (!target) {
+                if (!target)
+                {
                     outer.SetNextStateToMain();
                     return;
                 }
-                
+
                 info.projectilePrefab = ArbiterBoss.PillarProjectile;
                 info.damage = base.damageStat * 7f;
                 info.crit = base.RollCrit();
@@ -81,7 +86,8 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
                 ProjectileManager.instance.FireProjectile(info);
             }
 
-            if (base.fixedAge >= 4.5f) {
+            if (base.fixedAge >= 4.5f)
+            {
                 outer.SetNextStateToMain();
             }
         }

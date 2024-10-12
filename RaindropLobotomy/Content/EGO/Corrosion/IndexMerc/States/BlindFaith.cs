@@ -1,7 +1,8 @@
 using System;
 using RaindropLobotomy.Buffs;
 
-namespace RaindropLobotomy.EGO.Merc {
+namespace RaindropLobotomy.EGO.Merc
+{
     public class BlindFaith : CoolerBasicMeleeAttack, SteppedSkillDef.IStepSetter
     {
         public bool paladinInstalled => base.characterBody.bodyIndex == IndexMerc.IndexPaladinBody;
@@ -19,7 +20,7 @@ namespace RaindropLobotomy.EGO.Merc {
 
         public override GameObject SwingEffectPrefab => step == 2 ? Load<GameObject>("ErodedSlashBig.prefab") : Load<GameObject>("ErodedSlash.prefab");
 
-        public override string MuzzleString => paladinInstalled ? ( step == 0 ? "SwingRight" : "SwingLeft") : (step == 0 ? "GroundLight1" : step == 1 ? "GroundLight2" : "GroundLight3");
+        public override string MuzzleString => paladinInstalled ? (step == 0 ? "SwingRight" : "SwingLeft") : (step == 0 ? "GroundLight1" : step == 1 ? "GroundLight2" : "GroundLight3");
         public override string MechanimHitboxParameter => paladinInstalled ? null : "Sword.active";
         private int step = 0;
 
@@ -31,31 +32,38 @@ namespace RaindropLobotomy.EGO.Merc {
         public override void PlayAnimation()
         {
             AkSoundEngine.PostEvent(Events.Play_acrid_R_infect, base.gameObject);
-            if (paladinInstalled) {
-                switch (step) {
+            if (paladinInstalled)
+            {
+                switch (step)
+                {
                     case 0:
                         PlayCrossfade("Gesture, Override", "Slash1", "Slash.playbackRate", this.duration, 0.05f);
-                        if (!this.animator.GetBool("isMoving") && this.animator.GetBool("isGrounded")) {
+                        if (!this.animator.GetBool("isMoving") && this.animator.GetBool("isGrounded"))
+                        {
                             PlayCrossfade("FullBody, Override", "Slash1", "Slash.playbackRate", this.duration, 0.05f);
                         }
                         break;
                     case 1:
                         PlayCrossfade("Gesture, Override", "Slash2", "Slash.playbackRate", this.duration, 0.05f);
-                        if (!this.animator.GetBool("isMoving") && this.animator.GetBool("isGrounded")) {
+                        if (!this.animator.GetBool("isMoving") && this.animator.GetBool("isGrounded"))
+                        {
                             PlayCrossfade("FullBody, Override", "Slash2", "Slash.playbackRate", this.duration, 0.05f);
                         }
                         break;
                     case 2:
                         PlayCrossfade("Gesture, Override", "Slash1", "Slash.playbackRate", this.duration, 0.05f);
-                        if (!this.animator.GetBool("isMoving") && this.animator.GetBool("isGrounded")) {
+                        if (!this.animator.GetBool("isMoving") && this.animator.GetBool("isGrounded"))
+                        {
                             PlayCrossfade("FullBody, Override", "Slash1", "Slash.playbackRate", this.duration, 0.05f);
                         }
                         break;
                 }
             }
 
-            else {
-                switch (step) {
+            else
+            {
+                switch (step)
+                {
                     case 0:
                         PlayAnimationMerc("GroundLight1");
                         break;
@@ -72,11 +80,13 @@ namespace RaindropLobotomy.EGO.Merc {
         public override void AuthorityModifyOverlapAttack(OverlapAttack overlapAttack)
         {
             base.AuthorityModifyOverlapAttack(overlapAttack);
-    
-            if (step == 2) {
+
+            if (step == 2)
+            {
                 overlapAttack.AddModdedDamageType(Erosion.InflictTwoErosion);
             }
-            else {
+            else
+            {
                 overlapAttack.AddModdedDamageType(Erosion.InflictErosion);
             }
         }
@@ -85,13 +95,15 @@ namespace RaindropLobotomy.EGO.Merc {
         {
             base.BeginMeleeAttackEffect();
 
-            if (paladinInstalled) {
+            if (paladinInstalled)
+            {
                 swingEffectInstance.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                 // shift vfx by 90 degrees to compensate for different muzzle orientation
             }
         }
 
-        private void PlayAnimationMerc(string animation) {
+        private void PlayAnimationMerc(string animation)
+        {
             string animationStateName = animation;
             bool @bool = animator.GetBool("isMoving");
             bool bool2 = animator.GetBool("isGrounded");

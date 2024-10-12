@@ -1,7 +1,9 @@
 using System;
 
-namespace RaindropLobotomy.Enemies.SteamMachine {
-    public class Slam : BaseState {
+namespace RaindropLobotomy.Enemies.SteamMachine
+{
+    public class Slam : BaseState
+    {
         public Transform clawMuzzle;
         public bool performedSlam = false;
         private Vector3 forward;
@@ -12,15 +14,17 @@ namespace RaindropLobotomy.Enemies.SteamMachine {
             base.OnEnter();
             clawMuzzle = FindModelChild("Claw");
             PlayAnimation("Gesture, Override", "Slash", "Slam.playbackRate", 1f);
-            attack = new();
-            attack.damage = base.damageStat * 5f;
-            attack.attacker = base.gameObject;
-            attack.hitBoxGroup = FindHitBoxGroup("SlashHitbox");
-            attack.teamIndex = GetTeam();
-            attack.isCrit = RollCrit();
-            attack.procCoefficient = 1f;
-            attack.pushAwayForce = 2000f;
-            attack.forceVector = Vector3.up;
+            attack = new()
+            {
+                damage = base.damageStat * 5f,
+                attacker = base.gameObject,
+                hitBoxGroup = FindHitBoxGroup("SlashHitbox"),
+                teamIndex = GetTeam(),
+                isCrit = RollCrit(),
+                procCoefficient = 1f,
+                pushAwayForce = 2000f,
+                forceVector = Vector3.up
+            };
 
             base.characterBody.SetAimTimer(0.3f);
 
@@ -31,11 +35,13 @@ namespace RaindropLobotomy.Enemies.SteamMachine {
         {
             base.FixedUpdate();
 
-            if (animator.GetFloat("slashBegun") >= 0.5f && base.isAuthority) {
+            if (animator.GetFloat("slashBegun") >= 0.5f && base.isAuthority)
+            {
                 attack.Fire();
             }
 
-            if (base.fixedAge >= 2f) {
+            if (base.fixedAge >= 2f)
+            {
                 outer.SetNextStateToMain();
             }
         }

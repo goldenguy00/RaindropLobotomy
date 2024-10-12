@@ -1,8 +1,10 @@
 using System;
 using RaindropLobotomy.Buffs;
 
-namespace RaindropLobotomy.EGO.FalseSon {
-    public class Silence : BaseSkillState {
+namespace RaindropLobotomy.EGO.FalseSon
+{
+    public class Silence : BaseSkillState
+    {
         public float duration = 0.135f;
         public float prepDuration = 0.1f;
         public float buffDuration = 2.5f;
@@ -23,7 +25,8 @@ namespace RaindropLobotomy.EGO.FalseSon {
 
             AkSoundEngine.PostEvent(Events.Play_falseson_skill3_dash, base.gameObject);
 
-            if (NetworkServer.active) {
+            if (NetworkServer.active)
+            {
                 base.characterBody.AddTimedBuff(FeatherGuard.BuffIndex, buffDuration);
             }
         }
@@ -37,19 +40,22 @@ namespace RaindropLobotomy.EGO.FalseSon {
         {
             base.FixedUpdate();
 
-            if (isDashing) {
+            if (isDashing)
+            {
                 base.characterMotor.velocity = velocity;
                 base.characterDirection.forward = dashVector;
             }
 
-            if (base.fixedAge >= prepDuration && !isDashing) {
+            if (base.fixedAge >= prepDuration && !isDashing)
+            {
                 isDashing = true;
                 PlayCrossfade("FullBody, Override", "StepBrothersLoop", 0.1f);
 
                 GameObject.Instantiate(Paths.GameObject.FalseSonDashTrail, FindModelChild("DashCenter"));
             }
 
-            if (base.fixedAge >= duration + prepDuration) {
+            if (base.fixedAge >= duration + prepDuration)
+            {
                 outer.SetNextStateToMain();
             }
         }

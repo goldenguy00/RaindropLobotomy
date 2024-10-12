@@ -1,7 +1,8 @@
 using System;
 using RaindropLobotomy.Enemies;
 
-namespace RaindropLobotomy.Ordeals.Noon.Indigo {
+namespace RaindropLobotomy.Ordeals.Noon.Indigo
+{
     public class Sweeper : EnemyBase<Sweeper>
     {
         public static CharacterSpawnCard cscSweeper;

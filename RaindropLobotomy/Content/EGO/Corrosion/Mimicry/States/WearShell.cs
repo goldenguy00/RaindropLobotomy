@@ -1,7 +1,8 @@
 using System;
 using RoR2.ConVar;
 
-namespace RaindropLobotomy.EGO.Viend {
+namespace RaindropLobotomy.EGO.Viend
+{
     public class WearShell : CoolerBasicMeleeAttack
     {
         public override float BaseDuration => 0.7f;

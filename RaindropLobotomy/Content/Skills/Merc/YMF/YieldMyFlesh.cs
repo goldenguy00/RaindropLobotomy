@@ -1,6 +1,7 @@
 using System;
 
-namespace RaindropLobotomy.Skills.Merc {
+namespace RaindropLobotomy.Skills.Merc
+{
     public class YieldMyFlesh : SkillBase<YieldMyFlesh>
     {
         public override SkillDef SkillDef => Load<SkillDef>("sdYMF.asset");
@@ -17,7 +18,7 @@ namespace RaindropLobotomy.Skills.Merc {
             base.CreateLanguage();
 
             "RL_KEYWORD_UNRELENTING".Add("<style=cKeywordName>Unrelenting</style>While in an <style=cDeath>Unrelenting</style> state, your health cannot drop below 1. Gain brief invulnerability when leaving an <style=cDeath>Unrelenting</style> state.");
-        
+
             "RL_SKILL_YMF_NAME".Add("Yield My Flesh");
             "RL_SKILL_YMF_DESC".Add(
                 "<style=cDeath>Unrelenting.</style> Slash forward, dealing <style=cIsDamage>400% damage</style>. If you took damage during this skill, activate <style=cIsDamage>To Claim Their Bones</style>."

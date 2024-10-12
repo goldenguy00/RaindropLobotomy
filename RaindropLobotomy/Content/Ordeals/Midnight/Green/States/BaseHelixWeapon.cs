@@ -1,7 +1,9 @@
 using System;
 
-namespace RaindropLobotomy.Ordeals.Midnight.Green {
-    public class BaseHelixWeapon : BaseState {
+namespace RaindropLobotomy.Ordeals.Midnight.Green
+{
+    public class BaseHelixWeapon : BaseState
+    {
         public Transform muzzleL;
         public Transform muzzleR;
         public Transform cannonL;
@@ -20,17 +22,20 @@ namespace RaindropLobotomy.Ordeals.Midnight.Green {
             pivot = FindModelChild("Pivot");
         }
 
-        public Transform InitializeLazer(Transform muzzle, out GameObject inst) {
+        public Transform InitializeLazer(Transform muzzle, out GameObject inst)
+        {
             inst = GameObject.Instantiate(LastHelix.LaserPrefab, muzzle);
             return inst.transform.Find("LaserEnd");
         }
 
-        public void PointTowards(Transform cannon, Vector3 position) {
+        public void PointTowards(Transform cannon, Vector3 position)
+        {
             Vector3 norm = (position - cannon.transform.position).normalized;
             cannon.localRotation = Quaternion.Euler(0, norm.y, 0);
         }
 
-        public BulletAttack GetBulletAttack(Transform muzzle, Vector3 forward, float damage, float radius) {
+        public BulletAttack GetBulletAttack(Transform muzzle, Vector3 forward, float damage, float radius)
+        {
             BulletAttack attack = new();
             attack.damage = damage;
             attack.origin = muzzle.transform.position;
@@ -42,7 +47,7 @@ namespace RaindropLobotomy.Ordeals.Midnight.Green {
             attack.radius = radius;
             attack.smartCollision = false;
             attack.maxDistance = 4000f;
-            
+
             return attack;
         }
     }

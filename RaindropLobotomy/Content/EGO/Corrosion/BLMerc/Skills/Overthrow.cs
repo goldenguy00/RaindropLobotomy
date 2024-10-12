@@ -1,6 +1,7 @@
 using System;
 
-namespace RaindropLobotomy.EGO.Merc {
+namespace RaindropLobotomy.EGO.Merc
+{
     public class Overthrow : CoolerBasicMeleeAttack
     {
         public override float BaseDuration => 0.4f;
@@ -97,12 +98,14 @@ namespace RaindropLobotomy.EGO.Merc {
 
             stopwatch += Time.fixedDeltaTime;
 
-            if (!base.isGrounded) {
+            if (!base.isGrounded)
+            {
                 base.characterMotor.velocity = Vector3.down * 36f + (base.characterDirection.forward * 36f);
                 base.fixedAge = 0f;
             }
 
-            if ((base.isGrounded || stopwatch >= 10f) && !hasExited) {
+            if ((base.isGrounded || stopwatch >= 10f) && !hasExited)
+            {
                 hasExited = true;
                 outer.SetNextStateToMain();
             }
@@ -120,7 +123,8 @@ namespace RaindropLobotomy.EGO.Merc {
             base.OnExit();
             PlayAnimation("FullBody, Override", "WhirlwindAirExit");
 
-            if (base.isAuthority) {
+            if (base.isAuthority)
+            {
                 BlastAttack attack = new();
                 attack.attacker = base.gameObject;
                 attack.attackerFiltering = AttackerFiltering.NeverHitSelf;
@@ -133,7 +137,8 @@ namespace RaindropLobotomy.EGO.Merc {
                 attack.procCoefficient = 1f;
                 attack.AddModdedDamageType(Buffs.Poise.Instance.GivePoise);
 
-                EffectManager.SpawnEffect(Paths.GameObject.HermitCrabBombExplosion, new EffectData {
+                EffectManager.SpawnEffect(Paths.GameObject.HermitCrabBombExplosion, new EffectData
+                {
                     origin = attack.position,
                     scale = attack.radius
                 }, true);

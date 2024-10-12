@@ -1,6 +1,7 @@
 using System;
 
-namespace RaindropLobotomy.Enemies {
+namespace RaindropLobotomy.Enemies
+{
     public class ExplosionDeath : BaseState
     {
         private static readonly float bodyPreservationDuration = 1f;
@@ -61,14 +62,16 @@ namespace RaindropLobotomy.Enemies {
                 }
             }
 
-            else {
+            else
+            {
                 Destroy(this.GetModelTransform().gameObject);
-                EffectManager.SpawnEffect(Paths.GameObject.BleedOnHitAndExplodeExplosion, new EffectData {
+                EffectManager.SpawnEffect(Paths.GameObject.BleedOnHitAndExplodeExplosion, new EffectData
+                {
                     origin = base.characterBody.corePosition,
                     scale = base.characterBody.bestFitRadius,
                 }, false);
             }
-        
+
         }
 
         public override InterruptPriority GetMinimumInterruptPriority()

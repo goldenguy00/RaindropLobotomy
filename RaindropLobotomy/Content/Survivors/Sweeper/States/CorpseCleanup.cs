@@ -1,7 +1,8 @@
 using System;
 using RaindropLobotomy.EGO.Viend;
 
-namespace RaindropLobotomy.Survivors.Sweeper {
+namespace RaindropLobotomy.Survivors.Sweeper
+{
     public class CorpseCleanup : CoolerBasicMeleeAttack, SteppedSkillDef.IStepSetter
     {
         public override float BaseDuration => 0.8f;

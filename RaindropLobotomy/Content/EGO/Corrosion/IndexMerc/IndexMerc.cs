@@ -1,7 +1,8 @@
 using System;
 using RaindropLobotomy.Buffs;
 
-namespace RaindropLobotomy.EGO.Merc {
+namespace RaindropLobotomy.EGO.Merc
+{
     public class IndexMerc : CorrosionBase<IndexMerc>
     {
         public override string EGODisplayName => "Index Messenger Mercenary";
@@ -41,13 +42,13 @@ namespace RaindropLobotomy.EGO.Merc {
 
         public override void Create()
         {
-            
+
         }
 
         public override void Modify()
         {
             base.Modify();
-            
+
             BodyPrefab.GetComponent<ModelLocator>()._modelTransform.GetComponent<Animator>().runtimeAnimatorController = Paths.RuntimeAnimatorController.animMerc;
             BodyPrefab.GetComponent<ModelLocator>()._modelTransform.GetComponent<CharacterModel>().itemDisplayRuleSet = Paths.ItemDisplayRuleSet.idrsMerc;
             // Load<GameObject>("IndexMercDisplay.prefab").GetComponentInChildren<Animator>().runtimeAnimatorController = Paths.RuntimeAnimatorController.animMercDisplay;
@@ -60,8 +61,10 @@ namespace RaindropLobotomy.EGO.Merc {
             SharedSetup();
         }
 
-        public static void SharedSetup() {
-            if (HasRunSharedSetup) {
+        public static void SharedSetup()
+        {
+            if (HasRunSharedSetup)
+            {
                 return;
             }
 
@@ -153,7 +156,7 @@ namespace RaindropLobotomy.EGO.Merc {
             ErodedPuddle.GetComponent<ProjectileDotZone>().lifetime = 5f;
             ErodedPuddle.GetComponentInChildren<ObjectScaleCurve>().transform.localScale = new(16f, 1f, 16f);
             ErodedPuddle.GetComponentInChildren<HitBox>().transform.localScale *= 2f;
-        
+
             ContentAddition.AddProjectile(ErodedPuddle);
 
             sword.GetComponent<ProjectileExplosion>().fireChildren = true;
@@ -166,15 +169,18 @@ namespace RaindropLobotomy.EGO.Merc {
 
         private static void OnTakeDamage(On.RoR2.HealthComponent.orig_TakeDamageProcess orig, HealthComponent self, DamageInfo damageInfo)
         {
-            if (damageInfo.HasModdedDamageType(LockType)) {
+            if (damageInfo.HasModdedDamageType(LockType))
+            {
                 bool attacking = self.body.GetIsAttacking();
 
                 damageInfo.damage *= attacking ? 8f : 2.5f;
 
-                if (attacking) {
+                if (attacking)
+                {
                     SetStateOnHurt hurt = self.GetComponent<SetStateOnHurt>();
 
-                    if (hurt) {
+                    if (hurt)
+                    {
                         hurt.SetStun(2);
                     }
                 }
@@ -183,7 +189,8 @@ namespace RaindropLobotomy.EGO.Merc {
             orig(self, damageInfo);
         }
 
-        public class IndexLockTargeter : HurtboxTracker {
+        public class IndexLockTargeter : HurtboxTracker
+        {
             public override void Start()
             {
                 base.targetingIndicatorPrefab = Paths.GameObject.HuntressTrackingIndicator;
@@ -191,14 +198,16 @@ namespace RaindropLobotomy.EGO.Merc {
                 base.maxSearchDistance = 60f;
                 base.searchDelay = 0.1f;
                 base.targetType = TargetType.Enemy;
-                base.isActiveCallback = () => {
+                base.isActiveCallback = () =>
+                {
                     return body.skillLocator.secondary.stock > 0;
                 };
                 base.Start();
             }
         }
 
-        public class IndexPrescriptTargeter : HurtboxTracker {
+        public class IndexPrescriptTargeter : HurtboxTracker
+        {
             public override void Start()
             {
                 base.targetingIndicatorPrefab = Paths.GameObject.HuntressTrackingIndicator;
@@ -206,7 +215,8 @@ namespace RaindropLobotomy.EGO.Merc {
                 base.maxSearchDistance = 60f;
                 base.searchDelay = 0.1f;
                 base.targetType = TargetType.Friendly;
-                base.isActiveCallback = () => {
+                base.isActiveCallback = () =>
+                {
                     return body.skillLocator.special.stock > 0;
                 };
                 base.Start();
@@ -217,17 +227,21 @@ namespace RaindropLobotomy.EGO.Merc {
         {
             orig(self);
 
-            if (self.bodyIndex == IndexMercBody || self.bodyIndex == IndexPaladinBody) {
+            if (self.bodyIndex == IndexMercBody || self.bodyIndex == IndexPaladinBody)
+            {
                 SpawnGiantFist(self);
                 SpawnGiantFist(self);
             }
         }
 
-        public static void SpawnGiantFist(CharacterBody owner, int iterations = 1) {
+        public static void SpawnGiantFist(CharacterBody owner, int iterations = 1)
+        {
             Vector3[] positions = MiscUtils.GetSafePositionsWithinDistance(owner.transform.position, 45f * iterations);
 
-            if (positions.Length == 1) {
-                if (iterations > 10) {
+            if (positions.Length == 1)
+            {
+                if (iterations > 10)
+                {
                     return;
                 }
 
@@ -245,22 +259,26 @@ namespace RaindropLobotomy.EGO.Merc {
             summon.summonerBodyObject = owner.gameObject;
             summon.useAmbientLevel = false;
             summon.teamIndexOverride = TeamIndex.Player;
-           
+
             summon.Perform();
         }
 
-        public class DistortedBladeProjectile : MonoBehaviour {
+        public class DistortedBladeProjectile : MonoBehaviour
+        {
             public float timer = 0.8f;
             public Material mat;
-            public void Start() {
+            public void Start()
+            {
                 mat = GetComponentInChildren<MeshRenderer>().material;
             }
-            
-            public void FixedUpdate() {
+
+            public void FixedUpdate()
+            {
                 mat.SetVector("_ObjectPos", base.transform.position);
 
                 timer -= Time.fixedDeltaTime;
-                if (timer <= 0f && NetworkServer.active) {
+                if (timer <= 0f && NetworkServer.active)
+                {
                     GetComponent<ProjectileExplosion>().DetonateServer();
                     this.enabled = false;
                 }
@@ -275,30 +293,37 @@ namespace RaindropLobotomy.EGO.Merc {
         }
     }
 
-    public class GiantFistBehaviour : MonoBehaviour {
+    public class GiantFistBehaviour : MonoBehaviour
+    {
         public Transform owner;
         public CharacterBody body;
         public CharacterMaster master;
         public bool areWeIntangible = false;
-        public void Start() {
+        public void Start()
+        {
             body = GetComponent<CharacterBody>();
         }
-        public void FixedUpdate() {
-            if (!body.HasBuff(RoR2Content.Buffs.HiddenInvincibility)) {
+        public void FixedUpdate()
+        {
+            if (!body.HasBuff(RoR2Content.Buffs.HiddenInvincibility))
+            {
                 body.SetBuffCount(RoR2Content.Buffs.HiddenInvincibility.buffIndex, 1);
             }
 
-            if (!owner && master) {
+            if (!owner && master)
+            {
                 owner = master.minionOwnership.ownerMaster?.GetBody()?.transform ?? null;
             }
 
-            if (!master) {
+            if (!master)
+            {
                 master = body.master;
             }
         }
     }
-    
-    public class IndexMercMain : GenericCharacterMain {
+
+    public class IndexMercMain : GenericCharacterMain
+    {
         public override void UpdateAnimationParameters()
         {
             base.characterAnimParamAvailability.isSprinting = false;

@@ -1,6 +1,7 @@
 using System;
 
-namespace RaindropLobotomy.EGO.FalseSon {
+namespace RaindropLobotomy.EGO.FalseSon
+{
     public class Judgement : CoolerBasicMeleeAttack, SteppedSkillDef.IStepSetter
     {
         public override float BaseDuration => 0.8f;
@@ -18,7 +19,8 @@ namespace RaindropLobotomy.EGO.FalseSon {
         public override GameObject SwingEffectPrefab => Load<GameObject>("JustitiaSlash.prefab");
 
         public override string MuzzleString => _step % 2 == 0 ? "SwingRight" : "SwingLeft";
-        public override Func<bool> AlternateActiveParameter => () => {
+        public override Func<bool> AlternateActiveParameter => () =>
+        {
             return base.fixedAge >= base.duration * 0.3f;
         };
         private int _step;
@@ -41,7 +43,8 @@ namespace RaindropLobotomy.EGO.FalseSon {
             PlayCrossfade("Gesture, Additive", animationStateName, "SwingClub.playbackRate", num, 0.1f);
             PlayCrossfade("Gesture, Override", animationStateName, "SwingClub.playbackRate", num, 0.1f);
 
-            if (base.isAuthority) {
+            if (base.isAuthority)
+            {
                 FireProjectileInfo info = new();
                 info.projectilePrefab = EGOJustitia.AffectedByAnyDebuff(base.characterBody) ? EGOJustitia.AirSlashSinProjectile : EGOJustitia.AirSlashProjectile;
                 info.damage = overlapAttack.damage;

@@ -34,13 +34,15 @@ namespace RaindropLobotomy.Enemies
         public abstract string ConfigName { get; }
         public virtual void Create()
         {
-            if (!Main.config.Bind<bool>(ConfigName, "Enabled", true, "Should this enemy appear in runs?").Value) {
+            if (!Main.config.Bind<bool>(ConfigName, "Enabled", true, "Should this enemy appear in runs?").Value)
+            {
                 return;
             }
 
             LoadPrefabs();
             body = prefab.GetComponent<CharacterBody>();
-            if (prefabMaster) {
+            if (prefabMaster)
+            {
                 master = prefabMaster.GetComponent<CharacterMaster>();
             }
             Modify();
@@ -48,7 +50,8 @@ namespace RaindropLobotomy.Enemies
             AddDirectorCard();
             PostCreation();
 
-            if (typeof(Abnormality).IsAssignableFrom(this.GetType())) {
+            if (typeof(Abnormality).IsAssignableFrom(this.GetType()))
+            {
                 AbnormalityManager.AddAbnormality(this as Abnormality);
             }
         }
@@ -77,11 +80,13 @@ namespace RaindropLobotomy.Enemies
         public void RegisterEnemy(GameObject bodyPrefab, GameObject masterPrefab, List<DirectorAPI.Stage> stages = null, DirectorAPI.MonsterCategory category = DirectorAPI.MonsterCategory.BasicMonsters, bool all = false)
         {
             PrefabAPI.RegisterNetworkPrefab(bodyPrefab);
-            if (masterPrefab) {
+            if (masterPrefab)
+            {
                 PrefabAPI.RegisterNetworkPrefab(masterPrefab);
             }
             ContentAddition.AddBody(bodyPrefab);
-            if (masterPrefab) {
+            if (masterPrefab)
+            {
                 ContentAddition.AddMaster(masterPrefab);
             }
             if (stages != null)

@@ -3,7 +3,8 @@ using RoR2;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace RaindropLobotomy.Ordeals.Noon.Green {
+namespace RaindropLobotomy.Ordeals.Noon.Green
+{
     public class NoonDeath : BaseState
     {
         private static readonly float bodyPreservationDuration = 1f;
@@ -64,14 +65,16 @@ namespace RaindropLobotomy.Ordeals.Noon.Green {
                 }
             }
 
-            else {
+            else
+            {
                 Destroy(this.GetModelTransform().gameObject);
-                EffectManager.SpawnEffect(Paths.GameObject.OmniExplosionVFX, new EffectData {
+                EffectManager.SpawnEffect(Paths.GameObject.OmniExplosionVFX, new EffectData
+                {
                     origin = base.characterBody.corePosition,
                     scale = base.characterBody.bestFitRadius,
                 }, false);
             }
-        
+
         }
 
         public override InterruptPriority GetMinimumInterruptPriority()

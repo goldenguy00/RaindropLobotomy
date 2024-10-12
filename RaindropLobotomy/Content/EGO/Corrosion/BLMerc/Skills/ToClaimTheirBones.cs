@@ -2,13 +2,16 @@ using System;
 using System.Collections;
 using RaindropLobotomy.Buffs;
 
-namespace RaindropLobotomy.EGO.Merc {
-    public class ToClaimTheirBones_Exit : BaseState {
+namespace RaindropLobotomy.EGO.Merc
+{
+    public class ToClaimTheirBones_Exit : BaseState
+    {
         public override void OnEnter()
         {
             base.OnEnter();
 
-            if (NetworkServer.active) {
+            if (NetworkServer.active)
+            {
                 base.characterBody.SetBuffCount(Unrelenting.Instance.Buff.buffIndex, 0);
                 base.characterBody.SetBuffCount(RoR2Content.Buffs.HiddenInvincibility.buffIndex, 0);
             }
@@ -24,12 +27,14 @@ namespace RaindropLobotomy.EGO.Merc {
         }
     }
 
-    public class ToClaimTheirBones_Transition : BaseState {
+    public class ToClaimTheirBones_Transition : BaseState
+    {
         public float duration;
         public EntityState next;
         private bool force = false;
 
-        public ToClaimTheirBones_Transition(float duration, EntityState next, bool force = false) {
+        public ToClaimTheirBones_Transition(float duration, EntityState next, bool force = false)
+        {
             this.duration = duration;
             this.next = next;
             this.force = force;
@@ -46,7 +51,8 @@ namespace RaindropLobotomy.EGO.Merc {
 
             if (force) base.characterMotor.velocity = Vector3.zero;
 
-            if (base.fixedAge >= duration) {
+            if (base.fixedAge >= duration)
+            {
                 outer.SetNextState(next);
             }
         }
@@ -77,7 +83,8 @@ namespace RaindropLobotomy.EGO.Merc {
         private Vector3 forward;
         private float stopwatch = 0f;
 
-        public ToClaimTheirBones_3(float bonusDamage, GameObject visuals, Vector3 forward) {
+        public ToClaimTheirBones_3(float bonusDamage, GameObject visuals, Vector3 forward)
+        {
             this.bonusDamage = bonusDamage;
             this.visuals = visuals;
             this.forward = forward;
@@ -88,7 +95,8 @@ namespace RaindropLobotomy.EGO.Merc {
             damageCoefficient *= bonusDamage;
             base.OnEnter();
 
-            if (!Physics.Raycast(base.transform.position, forward, 90f, LayerIndex.world.mask)) {
+            if (!Physics.Raycast(base.transform.position, forward, 90f, LayerIndex.world.mask))
+            {
                 forward = Vector3.down;
             }
 
@@ -100,17 +108,19 @@ namespace RaindropLobotomy.EGO.Merc {
             base.OnExit();
 
             base.characterBody.bodyFlags &= ~CharacterBody.BodyFlags.IgnoreFallDamage;
-            
+
             PlayAnimation("FullBody, Override", "WhirlwindAirExit");
 
-            if (NetworkServer.active) {
+            if (NetworkServer.active)
+            {
                 base.characterBody.RemoveBuff(Unrelenting.Instance.Buff);
                 base.characterBody.RemoveBuff(RoR2Content.Buffs.HiddenInvincibility);
             }
 
             BLMerc.UpdateYieldingState(base.characterBody, false);
 
-            if (base.isAuthority) {
+            if (base.isAuthority)
+            {
                 BlastAttack attack = new();
                 attack.attacker = base.gameObject;
                 attack.attackerFiltering = AttackerFiltering.NeverHitSelf;
@@ -124,7 +134,8 @@ namespace RaindropLobotomy.EGO.Merc {
                 attack.baseDamage *= bonusDamage;
                 attack.damageType |= DamageType.CrippleOnHit;
 
-                EffectManager.SpawnEffect(Paths.GameObject.HermitCrabBombExplosion, new EffectData {
+                EffectManager.SpawnEffect(Paths.GameObject.HermitCrabBombExplosion, new EffectData
+                {
                     origin = attack.position,
                     scale = attack.radius
                 }, true);
@@ -145,12 +156,14 @@ namespace RaindropLobotomy.EGO.Merc {
 
             stopwatch += Time.fixedDeltaTime;
 
-            if (!base.isGrounded) {
+            if (!base.isGrounded)
+            {
                 base.characterMotor.velocity = forward * 200f;
                 base.fixedAge = 0f;
             }
 
-            if ((base.isGrounded || stopwatch >= 10f) && !hasExited) {
+            if ((base.isGrounded || stopwatch >= 10f) && !hasExited)
+            {
                 hasExited = true;
                 base.characterMotor.velocity = Vector3.zero;
                 GameObject.Destroy(visuals);
@@ -197,7 +210,8 @@ namespace RaindropLobotomy.EGO.Merc {
         private float bonusDamage;
         private GameObject visuals;
         private Vector3 attackerPosition;
-        public ToClaimTheirBones_2(float bonusDamage, GameObject visuals, Vector3 attackerPosition) {
+        public ToClaimTheirBones_2(float bonusDamage, GameObject visuals, Vector3 attackerPosition)
+        {
             this.bonusDamage = bonusDamage;
             this.attackerPosition = attackerPosition;
             this.visuals = visuals;
@@ -261,7 +275,8 @@ namespace RaindropLobotomy.EGO.Merc {
         private bool alreadySpawned;
         private GameObject swingEffectInstance;
 
-        public ToClaimTheirBones_1(float bonusDamage, Transform attacker) {
+        public ToClaimTheirBones_1(float bonusDamage, Transform attacker)
+        {
             this.bonusDamage = bonusDamage;
             this.attacker = attacker;
         }
@@ -296,39 +311,15 @@ namespace RaindropLobotomy.EGO.Merc {
             base.characterBody.StartCoroutine(NahIdLose());
         }
 
-        public IEnumerator NahIdLose() {
+        public IEnumerator NahIdLose()
+        {
             yield return new WaitForSeconds(0.35f);
             RandomTeleport();
             yield return new WaitForSeconds(0.1f);
             PlayAnimation("GroundLight1", 0.3f);
             rizz = "GroundLight1";
             yield return new WaitForSeconds(0.3f);
-            
-            RandomTeleport();
-            yield return new WaitForSeconds(0.1f);
-            PlayAnimation("GroundLight2", 0.3f);
-            rizz = "GroundLight2";
-            yield return new WaitForSeconds(0.3f);
 
-            RandomTeleport();
-            yield return new WaitForSeconds(0.1f);
-            PlayAnimation("GroundLight1", 0.3f);
-            rizz = "GroundLight1";
-            yield return new WaitForSeconds(0.3f);
-
-            RandomTeleport();
-            yield return new WaitForSeconds(0.1f);
-            PlayAnimation("GroundLight2", 0.3f);
-            rizz = "GroundLight2";
-            
-            yield return new WaitForSeconds(0.3f);
-
-            RandomTeleport();
-            yield return new WaitForSeconds(0.1f);
-            PlayAnimation("GroundLight1", 0.3f);
-            rizz = "GroundLight1";
-            yield return new WaitForSeconds(0.3f);
-            
             RandomTeleport();
             yield return new WaitForSeconds(0.1f);
             PlayAnimation("GroundLight2", 0.3f);
@@ -347,23 +338,49 @@ namespace RaindropLobotomy.EGO.Merc {
             rizz = "GroundLight2";
 
             yield return new WaitForSeconds(0.3f);
-            
+
+            RandomTeleport();
+            yield return new WaitForSeconds(0.1f);
+            PlayAnimation("GroundLight1", 0.3f);
+            rizz = "GroundLight1";
+            yield return new WaitForSeconds(0.3f);
+
+            RandomTeleport();
+            yield return new WaitForSeconds(0.1f);
+            PlayAnimation("GroundLight2", 0.3f);
+            rizz = "GroundLight2";
+            yield return new WaitForSeconds(0.3f);
+
+            RandomTeleport();
+            yield return new WaitForSeconds(0.1f);
+            PlayAnimation("GroundLight1", 0.3f);
+            rizz = "GroundLight1";
+            yield return new WaitForSeconds(0.3f);
+
+            RandomTeleport();
+            yield return new WaitForSeconds(0.1f);
+            PlayAnimation("GroundLight2", 0.3f);
+            rizz = "GroundLight2";
+
+            yield return new WaitForSeconds(0.3f);
+
             AuthorityOnFinish();
         }
 
         protected virtual void BeginMeleeAttackEffect(string muzzle)
         {
-            if (alreadySpawned) {
+            if (alreadySpawned)
+            {
                 return;
             }
 
             Transform transform = FindModelChild(muzzle);
-            
+
             swingEffectInstance = Object.Instantiate(BLMerc.DarkSlash, transform);
             ScaleParticleSystemDuration component = swingEffectInstance.GetComponent<ScaleParticleSystemDuration>();
-            
+
             component.newDuration = component.initialDuration;
-            
+
 
             alreadySpawned = true;
         }
@@ -371,15 +388,17 @@ namespace RaindropLobotomy.EGO.Merc {
         public override void FixedUpdate()
         {
             base.FixedUpdate();
-            
+
             base.characterBody.isSprinting = true;
             // base.characterMotor.velocity = base.characterDirection.forward * 10f;
 
-            if (attacker) {
+            if (attacker)
+            {
                 lastTargetPosition = attacker.transform.position;
             }
 
-            if (animator.GetFloat("Sword.active") >= 0.5f) {
+            if (animator.GetFloat("Sword.active") >= 0.5f)
+            {
                 BeginMeleeAttackEffect(rizz);
                 if (base.isAuthority) attack.Fire();
             }
@@ -390,7 +409,8 @@ namespace RaindropLobotomy.EGO.Merc {
             base.characterDirection.forward = (lastTargetPosition - base.transform.position).normalized;
         }
 
-        public void RandomTeleport() {
+        public void RandomTeleport()
+        {
             Vector3 pos = lastTargetPosition + (Random.onUnitSphere * 4f);
             pos += Vector3.up * 2f;
 

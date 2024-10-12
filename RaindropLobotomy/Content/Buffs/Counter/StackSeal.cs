@@ -1,10 +1,11 @@
 using System;
 using RaindropLobotomy.EGO.Commando;
 
-namespace RaindropLobotomy.Buffs {
+namespace RaindropLobotomy.Buffs
+{
     public class StackSeal : BuffBase<StackSeal>
     {
-        public override BuffDef Buff => Load<BuffDef>("bdLamentStackSeal.asset");
+        public override BuffDef Buff { get; set; } = Load<BuffDef>("bdLamentStackSeal.asset");
 
         public override void PostCreation()
         {
@@ -15,14 +16,17 @@ namespace RaindropLobotomy.Buffs {
         {
             orig(self, damageInfo, victim);
 
-            if (damageInfo.HasModdedDamageType(SolemnLament.StackingLament) && victim) {
+            if (damageInfo.HasModdedDamageType(SolemnLament.StackingLament) && victim)
+            {
                 CharacterBody body = victim.GetComponent<CharacterBody>();
 
-                if (body) {
+                if (body)
+                {
                     int count = body.GetBuffCount(Buff);
                     body.SetBuffCount(Buff.buffIndex, count + 1);
 
-                    if (count + 1 >= 5) {
+                    if (count + 1 >= 5)
+                    {
                         body.AddTimedBuff(Buffs.Sealed.Instance.Buff, 10f, 4);
                         body.SetBuffCount(Buff.buffIndex, 0);
                     }

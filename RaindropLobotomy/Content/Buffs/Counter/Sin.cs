@@ -4,10 +4,11 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using Mono.Cecil;
 
-namespace RaindropLobotomy.Buffs {
+namespace RaindropLobotomy.Buffs
+{
     public class Sin : BuffBase<Sin>
     {
-        public override BuffDef Buff => Load<BuffDef>("bdSin.asset");
+        public override BuffDef Buff { get; set; } = Load<BuffDef>("bdSin.asset");
 
         public static DamageAPI.ModdedDamageType SinReflectionType = DamageAPI.ReserveDamageType();
         public static DamageAPI.ModdedDamageType SinType = DamageAPI.ReserveDamageType();
@@ -18,11 +19,12 @@ namespace RaindropLobotomy.Buffs {
         public override void PostCreation()
         {
             On.RoR2.HealthComponent.TakeDamageProcess += HandleExecute;
-            IL.RoR2.UI.HealthBar.ApplyBars += UpdateExecutePreview;
+            //IL.RoR2.UI.HealthBar.ApplyBars += UpdateExecutePreview;
         }
 
-        private void UpdateExecutePreview(ILContext il)
+        private static void UpdateExecutePreview(ILContext il)
         {
+            // this is fucking cursed, your IL license has been revoked
             ILCursor c = new(il);
 
             MethodReference handleBar = null;
@@ -41,9 +43,11 @@ namespace RaindropLobotomy.Buffs {
             c.Index = 0;
 
             c.Emit(OpCodes.Ldarg_0);
-            c.EmitDelegate<Func<HealthBar, HealthBar.BarInfo>>((bar) => {
+            c.EmitDelegate<Func<HealthBar, HealthBar.BarInfo>>((bar) =>
+            {
 
-                HealthBar.BarInfo info = new() {
+                HealthBar.BarInfo info = new()
+                {
                     enabled = Executable(bar.source),
                     color = bar.style.curseBarStyle.baseColor,
                     sprite = bar.style.curseBarStyle.sprite,
@@ -53,7 +57,8 @@ namespace RaindropLobotomy.Buffs {
                     normalizedXMin = 0f
                 };
 
-                if (info.enabled) {
+                if (info.enabled)
+                {
                     float hp = GetExecuteFraction(bar.source);
                     float max = bar.source.fullCombinedHealth;
 
@@ -67,8 +72,10 @@ namespace RaindropLobotomy.Buffs {
 
             c.TryGotoNext(MoveType.After, x => x.MatchCallOrCallvirt<HealthBar.BarInfoCollection>(nameof(HealthBar.BarInfoCollection.GetActiveCount)));
             c.Emit(OpCodes.Ldloca, sinExecuteInfo);
-            c.EmitDelegate((int count, in HealthBar.BarInfo info) => {
-                if (info.enabled) {
+            c.EmitDelegate((int count, in HealthBar.BarInfo info) =>
+            {
+                if (info.enabled)
+                {
                     count++;
                 }
 
@@ -86,25 +93,30 @@ namespace RaindropLobotomy.Buffs {
         {
             orig(self, damageInfo);
 
-            if (damageInfo.HasModdedDamageType(SinReflectionType)) {
+            if (damageInfo.HasModdedDamageType(SinReflectionType))
+            {
                 int count = self.body.GetBuffCount(BuffIndex);
                 self.body.SetBuffCount(BuffIndex, count + 5);
             }
 
-            if (damageInfo.HasModdedDamageType(SinType)) {
+            if (damageInfo.HasModdedDamageType(SinType))
+            {
                 int count = self.body.GetBuffCount(BuffIndex);
                 self.body.SetBuffCount(BuffIndex, count + 1);
             }
 
-            if (Executable(self) && damageInfo.procChainMask.HasProc(ProcType.PlasmaCore)) {
+            if (Executable(self) && damageInfo.procChainMask.HasProc(ProcType.PlasmaCore))
+            {
                 float hp = GetExecuteHealth(self);
 
                 Debug.Log(hp + " : " + self.combinedHealth);
 
-                if (self.combinedHealth < hp) {
+                if (self.combinedHealth < hp)
+                {
                     self.Suicide(damageInfo.attacker);
 
-                    EffectManager.SpawnEffect(Paths.GameObject.OmniImpactExecuteBandit, new EffectData {
+                    EffectManager.SpawnEffect(Paths.GameObject.OmniImpactExecuteBandit, new EffectData
+                    {
                         origin = damageInfo.position,
                         scale = self.body.bestFitActualRadius,
                     }, true);
@@ -114,13 +126,15 @@ namespace RaindropLobotomy.Buffs {
             }
         }
 
-        private static bool Executable(HealthComponent hc) {
+        private static bool Executable(HealthComponent hc)
+        {
             return hc.body.GetBuffCount(BuffIndex) > 0;
         }
 
-        private static float GetExecuteHealth(HealthComponent hc) {
+        private static float GetExecuteHealth(HealthComponent hc)
+        {
             int stacks = hc.body.GetBuffCount(BuffIndex);
-            
+
             float percentagePer = baseHealthPerStack * (hc.body.isChampion ? championPenalty : 1f) / hc.body.baseMaxHealth;
 
             float percentage = stacks * percentagePer;
@@ -128,9 +142,10 @@ namespace RaindropLobotomy.Buffs {
             return hc.fullCombinedHealth * percentage;
         }
 
-        private static float GetExecuteFraction(HealthComponent hc) {
+        private static float GetExecuteFraction(HealthComponent hc)
+        {
             int stacks = hc.body.GetBuffCount(BuffIndex);
-            
+
             float percentagePer = baseHealthPerStack * (hc.body.isChampion ? championPenalty : 1f) / hc.body.baseMaxHealth;
 
             return stacks * percentagePer;

@@ -12,7 +12,8 @@ using RoR2.CharacterAI;
 using RoR2.ConVar;
 using RaindropLobotomy.Buffs;
 
-namespace RaindropLobotomy.Enemies.ArbiterBoss {
+namespace RaindropLobotomy.Enemies.ArbiterBoss
+{
     public class ArbiterBoss : EnemyBase<ArbiterBoss>
     {
         public static GameObject ArbiterSlashEffect;
@@ -49,9 +50,11 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
 
             CreateVFX();
 
-            On.RoR2.HealthComponent.TakeDamageProcess += (orig, self, info) => {
+            On.RoR2.HealthComponent.TakeDamageProcess += (orig, self, info) =>
+            {
                 orig(self, info);
-                if (self.name.Contains("BinahBody")) {
+                if (self.name.Contains("BinahBody"))
+                {
                     self.body.skillLocator.special.ExecuteIfReady();
                 }
             };
@@ -63,7 +66,8 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
             ContentAddition.AddProjectile(PillarProjectile);
         }
 
-        public void CreateVFX() {
+        public void CreateVFX()
+        {
             // standard fairy charge
             ArbiterSlashEffect = PrefabAPI.InstantiateClone(Paths.GameObject.MercSwordFinisherSlash, "ArbiterSlashEffect");
             ArbiterSlashEffect.transform.Find("Sparks").gameObject.SetActive(false);
@@ -90,7 +94,8 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
             main.startLifetime = 1.5f;
             main.startSizeMultiplier *= 0.3f;
             main.simulationSpeed = 2.5f;
-            for (int i = 0; i < 8; i++) {
+            for (int i = 0; i < 8; i++)
+            {
                 Transform target = FairyTracerSlashEffect.transform.Find("Flash");
                 GameObject duplicate = GameObject.Instantiate(target.gameObject, FairyTracerSlashEffect.transform);
                 duplicate.transform.localPosition = target.transform.localPosition;
@@ -113,7 +118,7 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
             ShockwaveChargeEffect.transform.Find("OrbCore").GetComponent<MeshRenderer>().sharedMaterials = new Material[] { Paths.Material.matGrandParentMoonCore, Paths.Material.matVoidBlinkPortal };
             ShockwaveChargeEffect.transform.GetComponent<ObjectScaleCurve>().enabled = false;
             ShockwaveChargeEffect.transform.localScale = Vector3.zero;
-            
+
             // shockwave telegraph
             ShockwaveTelegraphEffect = PrefabAPI.InstantiateClone(Paths.GameObject.VagrantNovaAreaIndicator, "ShockwaveAreaIndicator");
             ShockwaveTelegraphEffect.GetComponentInChildren<ParticleSystemRenderer>().material = Paths.Material.matGrandParentSunChannelStartBeam;
@@ -135,14 +140,15 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
             ShockwaveEffect.transform.Find("SparksOut").GetComponent<ParticleSystemRenderer>().material = Paths.Material.matGrandParentSunGlow;
             ShockwaveEffect.transform.Find("Sphere, Color").GetComponent<ParticleSystemRenderer>().material = Paths.Material.matMagmaWormExplosionSphere;
             ShockwaveEffect.transform.Find("Point Light").GetComponent<Light>().color = new Color32(255, 191, 42, 255);
-            
+
             // portal effect
             PillarPortalEffect = Load<GameObject>("PortalEffect.prefab");
             // PillarPortalEffect.transform.Find("Plane").GetComponent<MeshRenderer>().sharedMaterials = new Material[] { Paths.Material.matOmniRing1ArchWisp, Paths.Material.matGrandParentSunGlow };
             // PillarPortalEffect.transform.Find("Plane (1)").GetComponent<MeshRenderer>().sharedMaterials = new Material[] { Paths.Material.matArtifactShellDistortion, Paths.Material.matMegaDroneFlare1 };
         }
 
-        public class ArbiterArcingPillarBehaviour : MonoBehaviour {
+        public class ArbiterArcingPillarBehaviour : MonoBehaviour
+        {
             public ProjectileController projectile;
             public ProjectileDamage projectileDamage;
             public BeizerCurve arcPath;
@@ -160,12 +166,14 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
             public GameObject waveProjectilePrefab => Paths.GameObject.BrotherSunderWave;
             private float yPerSec => TotalYToRaise / timer.duration;
 
-            public void Start() {
+            public void Start()
+            {
                 projectile = GetComponent<ProjectileController>();
                 projectileDamage = GetComponent<ProjectileDamage>();
                 Vector3? tPos = (GetComponent<ProjectileTargetComponent>().target.transform.position + new Vector3(0f, 1f, 0f)).GroundPoint();
 
-                if (!tPos.HasValue) {
+                if (!tPos.HasValue)
+                {
                     this.enabled = false;
                     Destroy(this.gameObject);
                     return;
@@ -188,23 +196,27 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
                 TargetPos = tPos.Value;
             }
 
-            private Vector3 PickArcPathMidpoint(Vector3 start, Vector3 dest, float arcHeight) {
+            private Vector3 PickArcPathMidpoint(Vector3 start, Vector3 dest, float arcHeight)
+            {
                 Vector3 mid = Vector3.Lerp(start, dest, 0.5f);
                 mid.y += arcHeight;
 
-                if (Physics.Raycast(mid, Vector3.up, arcHeight + 7f, LayerIndex.world.mask, QueryTriggerInteraction.Ignore)) {
+                if (Physics.Raycast(mid, Vector3.up, arcHeight + 7f, LayerIndex.world.mask, QueryTriggerInteraction.Ignore))
+                {
                     mid.y -= 7f;
                 }
 
                 return mid;
             }
 
-            public void FixedUpdate() {
-                if (timer.Tick()) {
+            public void FixedUpdate()
+            {
+                if (timer.Tick())
+                {
                     pillarRenderer.material.SetFloat("_ShouldClip", 1f);
 
                     totalDistTraversed += speed * Time.fixedDeltaTime;
-                    
+
                     Vector3 next = arcPath.GetBeizerPointAtDistance(totalDistTraversed);
                     Vector3 forward = arcPath.GetRotationAlongCurve(totalDistTraversed);
                     Vector3 rotation = Vector3.RotateTowards(Spearhead.up, -forward, (200f * (Mathf.PI / 180)), float.PositiveInfinity);
@@ -214,17 +226,20 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
                     // Debug.Log(Spearhead.position + " : sp");
                     // Debug.Log(TargetPos + " : tp");
 
-                    if (Vector3.Distance(Spearhead.position, TargetPos) < 0.5f) {
+                    if (Vector3.Distance(Spearhead.position, TargetPos) < 0.5f)
+                    {
                         Detonate();
                         timer.expired = true;
                     }
                 }
-                else {
+                else
+                {
                     Spearhead.localPosition += new Vector3(0f, TotalYToRaise * Time.fixedDeltaTime, 0f);
                 }
             }
 
-            public void Detonate() {
+            public void Detonate()
+            {
                 FireRingAuthority(Spearhead.transform.position, base.transform.forward);
                 base.enabled = false;
             }
@@ -254,13 +269,15 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
 
             public void OnProjectileImpact(ProjectileImpactInfo impactInfo)
             {
-                if (!hasFiredRing) {
+                if (!hasFiredRing)
+                {
                     hasFiredRing = true;
                     FireRingAuthority(impactInfo.estimatedPointOfImpact, impactInfo.estimatedImpactNormal);
                 }
             }
 
-            private void Start() {
+            private void Start()
+            {
                 projectile = GetComponent<ProjectileController>();
                 projectileDamage = GetComponent<ProjectileDamage>();
             }
@@ -280,14 +297,16 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
             }
         }
 
-        public class DelayedPillarShot : MonoBehaviour {
+        public class DelayedPillarShot : MonoBehaviour
+        {
             public Timer timer = new(2f, expires: true);
             public MeshRenderer renderer;
             public Material mat;
             public GameObject portalEffect;
             public Transform pillar;
-            
-            public void Start() {
+
+            public void Start()
+            {
                 renderer = GetComponentInChildren<MeshRenderer>();
                 portalEffect = GameObject.Instantiate(PillarPortalEffect, base.transform.position, Quaternion.LookRotation(-base.transform.forward));
                 mat = renderer.material;
@@ -295,17 +314,21 @@ namespace RaindropLobotomy.Enemies.ArbiterBoss {
                 mat.SetVector("_ClippingView", portalEffect.transform.forward);
                 mat.SetVector("_ObjectPos", portalEffect.transform.position);
             }
-            public void FixedUpdate() {
-                if (portalEffect) {
+            public void FixedUpdate()
+            {
+                if (portalEffect)
+                {
                     mat.SetVector("_ClippingView", portalEffect.transform.forward);
                     mat.SetVector("_ObjectPos", portalEffect.transform.position);
                 }
 
-                if (pillar.transform.localPosition.z < 0 && timer.cur >= 1f) {
+                if (pillar.transform.localPosition.z < 0 && timer.cur >= 1f)
+                {
                     pillar.transform.localPosition += new Vector3(0, 0, (5.38f / (timer.duration - 1f)) * Time.fixedDeltaTime);
                 }
 
-                if (timer.Tick()) {
+                if (timer.Tick())
+                {
                     GetComponent<ProjectileSimple>().enabled = true;
                     GetComponent<Rigidbody>().useGravity = true;
                     GetComponent<BoxCollider>().enabled = true;

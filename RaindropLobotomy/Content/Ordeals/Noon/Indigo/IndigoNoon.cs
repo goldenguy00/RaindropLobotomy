@@ -1,7 +1,8 @@
 using System;
 using System.Linq;
 
-namespace RaindropLobotomy.Ordeals.Noon.Indigo {
+namespace RaindropLobotomy.Ordeals.Noon.Indigo
+{
     public class GreenIndigo : OrdealBase
     {
         public override OrdealLevel OrdealLevel => OrdealLevel.NOON;
@@ -16,12 +17,14 @@ namespace RaindropLobotomy.Ordeals.Noon.Indigo {
 
         public override void OnSpawnOrdeal(RoR2.Stage stage)
         {
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 3; i++)
+            {
                 PlayerCharacterMasterController[] masters = PlayerCharacterMasterController.instances.Where(x => x.body && x.body.healthComponent.alive).ToArray();
 
                 PlayerCharacterMasterController master = masters.GetRandom();
 
-                for (int j = 0; j < 3; j++) {
+                for (int j = 0; j < 3; j++)
+                {
                     DirectorPlacementRule rule = new();
                     rule.maxDistance = 20;
                     rule.placementMode = DirectorPlacementRule.PlacementMode.NearestNode;
@@ -29,8 +32,10 @@ namespace RaindropLobotomy.Ordeals.Noon.Indigo {
 
                     DirectorSpawnRequest spawnReq = new(Sweeper.cscSweeper, rule, Run.instance.spawnRng);
                     spawnReq.teamIndexOverride = TeamIndex.Monster;
-                    spawnReq.onSpawnedServer = (res) => {
-                        if (res.success) {
+                    spawnReq.onSpawnedServer = (res) =>
+                    {
+                        if (res.success)
+                        {
                             CharacterMaster cMaster = res.spawnedInstance.GetComponent<CharacterMaster>();
                             cMaster.inventory.GiveItem(RoR2Content.Items.UseAmbientLevel);
                         }

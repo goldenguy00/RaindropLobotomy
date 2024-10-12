@@ -1,14 +1,17 @@
 using System;
 
-namespace RaindropLobotomy.EGO.Viend {
-    public class Goodbye : BaseState {
+namespace RaindropLobotomy.EGO.Viend
+{
+    public class Goodbye : BaseState
+    {
         public override void OnEnter()
         {
             base.OnEnter();
             FindModelChild("ScytheScaleBone").GetComponent<EGOMimicry.GoodbyeArmStretcher>().BeginGoodbye(0);
             base.StartAimMode();
 
-            if (EGOMimicry.config.PlayGoodbyeAudio) {
+            if (EGOMimicry.config.PlayGoodbyeAudio)
+            {
                 AkSoundEngine.PostEvent("Play_NT_goodbye", base.gameObject);
             }
         }
@@ -17,7 +20,8 @@ namespace RaindropLobotomy.EGO.Viend {
         {
             base.FixedUpdate();
 
-            if (base.fixedAge >= 0.2f) {
+            if (base.fixedAge >= 0.2f)
+            {
                 outer.SetNextState(new GoodbyeSlash());
             }
         }
@@ -43,7 +47,7 @@ namespace RaindropLobotomy.EGO.Viend {
         public override void OnEnter()
         {
             base.OnEnter();
-            
+
             base.characterMotor.Motor.ForceUnground();
             base.characterMotor.velocity += (base.characterDirection.forward * 26f) + (base.transform.up * 9f);
 
@@ -76,7 +80,8 @@ namespace RaindropLobotomy.EGO.Viend {
         public override void BeginMeleeAttackEffect()
         {
             base.BeginMeleeAttackEffect();
-            if (swingEffectInstance) {
+            if (swingEffectInstance)
+            {
                 ParticleSystem system = swingEffectInstance.transform.Find("Rotator").Find("SwingTrail").GetComponent<ParticleSystem>();
                 ParticleSystem.MainModule main = system.main;
                 ParticleSystem.MinMaxCurve curve = main.startSize;
@@ -86,7 +91,8 @@ namespace RaindropLobotomy.EGO.Viend {
         }
     }
 
-    public class GoodbyeEnd : BaseState {
+    public class GoodbyeEnd : BaseState
+    {
         public override void OnEnter()
         {
             base.OnEnter();
@@ -97,7 +103,8 @@ namespace RaindropLobotomy.EGO.Viend {
         {
             base.FixedUpdate();
 
-            if (base.fixedAge >= 0.2f) {
+            if (base.fixedAge >= 0.2f)
+            {
                 outer.SetNextStateToMain();
             }
         }

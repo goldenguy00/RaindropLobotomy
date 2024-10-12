@@ -33,11 +33,13 @@ namespace RaindropLobotomy.Skills
         public abstract SkillSlot Slot { get; }
         public abstract UnlockableDef Unlock { get; }
 
-        public virtual void CreateLanguage() {
+        public virtual void CreateLanguage()
+        {
 
         }
 
-        public void Create() {
+        public void Create()
+        {
             CreateLanguage();
             ContentAddition.AddSkillDef(SkillDef);
 
@@ -46,7 +48,8 @@ namespace RaindropLobotomy.Skills
 
             SkillFamily family = null;
 
-            switch (Slot) {
+            switch (Slot)
+            {
                 case SkillSlot.Primary:
                     family = skillLocator.primary.skillFamily;
                     break;
@@ -63,10 +66,12 @@ namespace RaindropLobotomy.Skills
                     break;
             }
 
-            if (family != null) {
+            if (family != null)
+            {
                 Array.Resize(ref family.variants, family.variants.Length + 1);
-                    
-                family.variants[family.variants.Length - 1] = new SkillFamily.Variant {
+
+                family.variants[family.variants.Length - 1] = new SkillFamily.Variant
+                {
                     skillDef = SkillDef,
                     unlockableDef = Unlock,
                     viewableNode = new ViewablesCatalog.Node(SkillDef.skillNameToken, false, null)

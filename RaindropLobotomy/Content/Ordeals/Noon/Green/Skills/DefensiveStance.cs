@@ -1,17 +1,20 @@
 using System;
 
-namespace RaindropLobotomy.Ordeals.Noon.Green {
-    public class DefensiveStance : BaseSkillState {
+namespace RaindropLobotomy.Ordeals.Noon.Green
+{
+    public class DefensiveStance : BaseSkillState
+    {
         public float duration = 20f;
         private HurtBox[] boxes;
+        private Animator modelAnimator;
 
         public override void OnEnter()
         {
             base.OnEnter();
-
-            GetModelAnimator().SetBool("isDefensive", true);
-            GetModelAnimator().SetBool("isFiring", false);
-            GetModelAnimator().SetBool("isSawing", true);
+            modelAnimator = GetModelAnimator();
+            modelAnimator.SetBool("isDefensive", true);
+            modelAnimator.SetBool("isFiring", false);
+            modelAnimator.SetBool("isSawing", true);
 
             EntityStateMachine.FindByCustomName(base.gameObject, "Weapon").SetNextStateToMain();
 
@@ -21,7 +24,8 @@ namespace RaindropLobotomy.Ordeals.Noon.Green {
 
             boxes = modelLocator.modelTransform.GetComponent<HurtBoxGroup>().hurtBoxes;
 
-            for (int i = 0; i < boxes.Length; i++) {
+            for (int i = 0; i < boxes.Length; i++)
+            {
                 if (i == 6) continue;
                 boxes[i].damageModifier = HurtBox.DamageModifier.Barrier;
             }
@@ -31,7 +35,8 @@ namespace RaindropLobotomy.Ordeals.Noon.Green {
         {
             base.FixedUpdate();
 
-            if (base.fixedAge >= duration) {
+            if (base.fixedAge >= duration)
+            {
                 outer.SetNextStateToMain();
             }
 
@@ -42,11 +47,12 @@ namespace RaindropLobotomy.Ordeals.Noon.Green {
         {
             base.OnExit();
 
-            GetModelAnimator().SetBool("isDefensive", false);
+            modelAnimator.SetBool("isDefensive", false);
 
             EntityStateMachine.FindByCustomName(base.gameObject, "Weapon").SetNextStateToMain();
 
-            for (int i = 0; i < boxes.Length; i++) {
+            for (int i = 0; i < boxes.Length; i++)
+            {
                 if (i == 6) continue;
                 boxes[i].damageModifier = HurtBox.DamageModifier.Normal;
             }
@@ -67,7 +73,7 @@ namespace RaindropLobotomy.Ordeals.Noon.Green {
                     HandleSkill(base.skillLocator.secondary, ref base.inputBank.skill2);
                     HandleSkill(base.skillLocator.utility, ref base.inputBank.skill3);
                 }
-                
+
             }
             void HandleSkill(GenericSkill skillSlot, ref InputBankTest.ButtonState buttonState)
             {

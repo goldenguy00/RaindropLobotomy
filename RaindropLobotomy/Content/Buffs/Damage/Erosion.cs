@@ -1,9 +1,10 @@
 using System;
 
-namespace RaindropLobotomy.Buffs {
+namespace RaindropLobotomy.Buffs
+{
     public class Erosion : BuffBase<Erosion>
     {
-        public override BuffDef Buff => Load<BuffDef>("bdErosion.asset");
+        public override BuffDef Buff { get; set; } = Load<BuffDef>("bdErosion.asset");
         public BurnEffectController.EffectParams ErosionEffect;
         public static DamageAPI.ModdedDamageType InflictErosion = DamageAPI.ReserveDamageType();
         public static DamageAPI.ModdedDamageType InflictTwoErosion = DamageAPI.ReserveDamageType();
@@ -23,13 +24,16 @@ namespace RaindropLobotomy.Buffs {
         {
             orig(self, buffType);
 
-            if (buffType == Buff.buffIndex) {
+            if (buffType == Buff.buffIndex)
+            {
                 CharacterModel model = self.modelLocator?.modelTransform?.GetComponent<CharacterModel>() ?? null;
 
-                if (model) {
+                if (model)
+                {
                     ErosionController controller = model.GetComponent<ErosionController>();
 
-                    if (!controller) {
+                    if (!controller)
+                    {
                         controller = model.AddComponent<ErosionController>();
                     }
 
@@ -44,17 +48,20 @@ namespace RaindropLobotomy.Buffs {
         {
             orig(self, damageInfo);
 
-            if (damageInfo.procCoefficient > 0 && damageInfo.attacker && NetworkServer.active) {
+            if (damageInfo.procCoefficient > 0 && damageInfo.attacker && NetworkServer.active)
+            {
                 int count = self.body.GetBuffCount(Buff.buffIndex);
 
-                if (damageInfo.HasModdedDamageType(InflictErosion) && damageInfo.procCoefficient < 0.2f) {
-                    goto next;
+                if (damageInfo.HasModdedDamageType(InflictErosion) && damageInfo.procCoefficient < 0.2f)
+                {
+                    //no.
+                    //goto next;
                 }
-
-                if (count > 0) {
+                else if (count > 0)
+                {
                     float damage = (0.2f * count) * damageInfo.attacker.GetComponent<CharacterBody>().damage;
                     self.body.SetBuffCount(Buff.buffIndex, count - 1);
-                    
+
                     DamageInfo info = new();
                     info.attacker = damageInfo.attacker;
                     info.position = damageInfo.position;
@@ -69,29 +76,34 @@ namespace RaindropLobotomy.Buffs {
                 }
             }
 
-            next:
-
-            if (damageInfo.HasModdedDamageType(InflictErosion)) {
+            if (damageInfo.HasModdedDamageType(InflictErosion))
+            {
                 self.body.AddTimedBuff(Buff.buffIndex, 10f);
             }
 
-            if (damageInfo.HasModdedDamageType(InflictTwoErosion)) {
+            if (damageInfo.HasModdedDamageType(InflictTwoErosion))
+            {
                 self.body.AddTimedBuff(Buff.buffIndex, 10f);
                 self.body.AddTimedBuff(Buff.buffIndex, 10f);
             }
 
-            if (damageInfo.HasModdedDamageType(InflictTenErosion)) {
-                for (int i = 0; i < 10; i++) {
+            if (damageInfo.HasModdedDamageType(InflictTenErosion))
+            {
+                for (int i = 0; i < 10; i++)
+                {
                     self.body.AddTimedBuff(Buff.buffIndex, 10f);
                 }
             }
         }
 
-        private class ErosionController : BurnEffectController {
+        private class ErosionController : BurnEffectController
+        {
             internal CharacterBody body;
 
-            public void FixedUpdate() {
-                if (!body || !body.healthComponent || !body.healthComponent.alive || !body.HasBuff(Erosion.Instance.Buff)) {
+            public void FixedUpdate()
+            {
+                if (!body || !body.healthComponent || !body.healthComponent.alive || !body.HasBuff(Erosion.Instance.Buff))
+                {
                     Destroy(this);
                 }
             }

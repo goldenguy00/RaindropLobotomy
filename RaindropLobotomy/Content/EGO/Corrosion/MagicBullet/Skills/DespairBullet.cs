@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 
-namespace RaindropLobotomy.EGO.Bandit {
-    public class DespairBullet : BaseSkillState {
+namespace RaindropLobotomy.EGO.Bandit
+{
+    public class DespairBullet : BaseSkillState
+    {
         public string PortalMuzzle = "PortalMuzzle";
         public string BulletMuzzle = "MuzzleShotgun";
         public GameObject PortalPrefab => EGOMagicBullet.PortalPrefab;
@@ -29,14 +31,17 @@ namespace RaindropLobotomy.EGO.Bandit {
             base.characterBody.StartCoroutine(ProcessBullet());
         }
 
-        public IEnumerator ProcessBullet() {
+        public IEnumerator ProcessBullet()
+        {
             GameObject portalInst = GameObject.Instantiate(PortalPrefab, FindModelChild(PortalMuzzle));
             portal = portalInst.GetComponent<MagicBulletPortal>();
-            
-            if (EGOMagicBullet.config.UseVanillaSounds) {
+
+            if (EGOMagicBullet.config.UseVanillaSounds)
+            {
                 AkSoundEngine.PostEvent(Events.Play_mage_m2_shoot, base.gameObject);
             }
-            else {
+            else
+            {
                 AkSoundEngine.PostEvent("Play_fruitloop_portal", base.gameObject);
             }
 
@@ -45,20 +50,23 @@ namespace RaindropLobotomy.EGO.Bandit {
 
             portal.outputPortals.Add(output);
             output.isOutput = true;
-            
+
             yield return new WaitForSeconds(0.8f);
 
             BulletAttack attack = GetBullet();
 
-            if (base.isAuthority) {
+            if (base.isAuthority)
+            {
                 attack.Fire();
                 portal.FireBullet(attack);
             }
 
-            if (EGOMagicBullet.config.UseVanillaSounds) {
+            if (EGOMagicBullet.config.UseVanillaSounds)
+            {
                 AkSoundEngine.PostEvent(Events.Play_bandit2_m1_rifle, base.gameObject);
             }
-            else {
+            else
+            {
                 AkSoundEngine.PostEvent("Play_fruitloop_shot", base.gameObject);
             }
 
@@ -85,7 +93,8 @@ namespace RaindropLobotomy.EGO.Bandit {
         {
             base.FixedUpdate();
 
-            if (output) {
+            if (output)
+            {
                 output.transform.position = (base.GetAimRay().origin) + (-(base.GetAimRay().direction) * 5f);
                 output.transform.forward = (base.GetAimRay().GetPoint(50f) - output.transform.position).normalized;
             }
@@ -93,7 +102,8 @@ namespace RaindropLobotomy.EGO.Bandit {
             StartAimMode(0.1f);
         }
 
-        public BulletAttack GetBullet() {
+        public BulletAttack GetBullet()
+        {
             Transform muzzle = FindModelChild(BulletMuzzle);
             float distance = Vector3.Distance(muzzle.position, portal.transform.position);
 

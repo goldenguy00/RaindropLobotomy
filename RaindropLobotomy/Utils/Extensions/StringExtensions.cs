@@ -82,8 +82,8 @@ namespace RaindropLobotomy.Utils
             public string expanded;
         }
 
-        private static List<Format> formats = new()
-        {
+        private static List<Format> formats =
+        [
             new Format
             {
                 match = "$su",
@@ -125,7 +125,7 @@ namespace RaindropLobotomy.Utils
                 match = "$pc",
                 expanded = "<color=#406096>"
             }
-        };
+        ];
 
         internal static string FormatString(string str)
         {

@@ -1,7 +1,9 @@
 using System;
 
-namespace RaindropLobotomy.EGO.Toolbot {
-    public class Rest : GenericCharacterMain {
+namespace RaindropLobotomy.EGO.Toolbot
+{
+    public class Rest : GenericCharacterMain
+    {
         public Animator animBlades;
         public float regenPerSecond = 7.5f;
         public float cooldownAcceleration = 1f;
@@ -12,7 +14,7 @@ namespace RaindropLobotomy.EGO.Toolbot {
             base.OnEnter();
 
             PlayCrossfade("Body", "BoxModeEnter", 0.1f);
-		    PlayCrossfade("Stance, Override", "PutAwayGun", 0.1f);
+            PlayCrossfade("Stance, Override", "PutAwayGun", 0.1f);
 
             base.GetModelAnimator().SetFloat("aimWeight", 0f);
 
@@ -48,12 +50,14 @@ namespace RaindropLobotomy.EGO.Toolbot {
             stopwatches[0] += Time.fixedDeltaTime;
             stopwatches[1] += Time.fixedDeltaTime;
 
-            if (stopwatches[0] >= 0.33f) {
+            if (stopwatches[0] >= 0.33f)
+            {
                 base.healthComponent.Heal(base.healthComponent.health * ((regenPerSecond / 3) * 0.01f), default);
                 stopwatches[0] = 0f;
             }
 
-            if (stopwatches[1] >= chargeDelay) {
+            if (stopwatches[1] >= chargeDelay)
+            {
                 Grinder.IncreaseCharge(base.characterBody);
                 stopwatches[1] = 0f;
             }
@@ -62,19 +66,23 @@ namespace RaindropLobotomy.EGO.Toolbot {
             UpdateSkill(base.skillLocator.secondary, Time.fixedDeltaTime);
             UpdateSkill(base.skillLocator.special, Time.fixedDeltaTime);
 
-            if (base.fixedAge >= 1f && inputBank.skill3.down) {
+            if (base.fixedAge >= 1f && inputBank.skill3.down)
+            {
                 outer.SetNextStateToMain();
             }
 
-            else if (base.fixedAge >= 1f && inputBank.jump.down) {
+            else if (base.fixedAge >= 1f && inputBank.jump.down)
+            {
                 base.characterMotor.Motor.ForceUnground();
                 base.characterMotor.velocity = Vector3.up * 30f;
                 outer.SetNextStateToMain();
             }
         }
 
-        public void UpdateSkill(GenericSkill slot, float delta) {
-            if (slot.stock < slot.maxStock) {
+        public void UpdateSkill(GenericSkill slot, float delta)
+        {
+            if (slot.stock < slot.maxStock)
+            {
                 slot.rechargeStopwatch += delta * cooldownAcceleration;
             }
         }
@@ -86,17 +94,17 @@ namespace RaindropLobotomy.EGO.Toolbot {
             animBlades.SetBool("boxed", false);
 
             PlayAnimation("Body", "BoxModeExit");
-			PlayCrossfade("Stance, Override", "Empty", 0.1f);
-			
-			if (NetworkServer.active)
-			{
-				base.characterBody.RemoveBuff(RoR2Content.Buffs.ArmorBoost);
-			}
+            PlayCrossfade("Stance, Override", "Empty", 0.1f);
+
+            if (NetworkServer.active)
+            {
+                base.characterBody.RemoveBuff(RoR2Content.Buffs.ArmorBoost);
+            }
 
             base.GetModelAnimator().SetFloat("aimWeight", 1f);
 
             base.modelLocator.normalizeToFloor = false;
-            
+
             AkSoundEngine.PostEvent(Events.Play_MULT_shift_end, base.gameObject);
 
             EffectManager.SimpleEffect(Paths.GameObject.Bandit2SmokeBombMini, base.transform.position, Quaternion.identity, false);

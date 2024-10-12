@@ -42,7 +42,7 @@ namespace RaindropLobotomy.Utils
         /// <returns>A list of points evenly distributed around the desired sphere.</returns>
         public static List<Vector3> DistributePointsEvenlyAroundSphere(int points, float radius, Vector3 origin)
         {
-            List<Vector3> pointArray = new List<Vector3>();
+            List<Vector3> pointArray = [];
 
             var phi = Math.PI * (3 - Math.Sqrt(5));
 
@@ -73,7 +73,7 @@ namespace RaindropLobotomy.Utils
         /// <returns>A list of points evenly distributed around the desired circle.</returns>
         public static List<Vector3> DistributePointsEvenlyAroundCircle(int points, float radius, Vector3 origin, float angleOffset = 0)
         {
-            List<Vector3> pointsList = new List<Vector3>();
+            List<Vector3> pointsList = [];
             for (int i = 0; i < points; i++)
             {
                 var theta = (Math.PI * 2) / points;

@@ -1,7 +1,8 @@
 using System;
 using System.Text;
 
-namespace RaindropLobotomy.EGO.Merc {
+namespace RaindropLobotomy.EGO.Merc
+{
     public class Acupuncture : CoolerBasicMeleeAttack
     {
         public override float BaseDuration => 0.25f;
@@ -37,8 +38,9 @@ namespace RaindropLobotomy.EGO.Merc {
         public override void AuthorityModifyOverlapAttack(OverlapAttack overlapAttack)
         {
             base.AuthorityModifyOverlapAttack(overlapAttack);
-            
-            if (overlapAttack.isCrit) {
+
+            if (overlapAttack.isCrit)
+            {
                 overlapAttack.AddModdedDamageType(BLMerc.PoiseDamageBonus);
             }
         }

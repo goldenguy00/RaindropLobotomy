@@ -6,10 +6,12 @@ using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RaindropLobotomy.Utils {
+namespace RaindropLobotomy.Utils
+{
     [RequireComponent(typeof(InputBankTest))]
     [RequireComponent(typeof(CharacterBody))]
-    public abstract class Tracker : MonoBehaviour {
+    public abstract class Tracker : MonoBehaviour
+    {
         public Transform target;
         public Indicator indicator;
         public GameObject targetingIndicatorPrefab;
@@ -24,35 +26,43 @@ namespace RaindropLobotomy.Utils {
         public float minDot => Mathf.Cos(Mathf.Clamp(maxSearchAngle, 0f, 180f) * ((float)Math.PI / 180f));
         public Func<bool> isActiveCallback = DefaultIsActiveCallback;
 
-        private static bool DefaultIsActiveCallback() {
+        private static bool DefaultIsActiveCallback()
+        {
             return true;
         }
 
-        public virtual void Start() {
+        public virtual void Start()
+        {
             indicator = new(base.gameObject, targetingIndicatorPrefab);
             body = GetComponent<CharacterBody>();
             inputBank = GetComponent<InputBankTest>();
         }
 
-        public virtual void FixedUpdate() {
-            if (indicator != null && !DefaultIsActiveCallback()) {
+        public virtual void FixedUpdate()
+        {
+            if (indicator != null && !DefaultIsActiveCallback())
+            {
                 indicator.active = false;
                 return;
             }
 
-            if (indicator != null && !target) {
+            if (indicator != null && !target)
+            {
                 indicator.active = false;
             }
 
-            if (indicator != null && target) {
+            if (indicator != null && target)
+            {
                 indicator.active = true;
             }
 
             stopwatch += Time.fixedDeltaTime;
-            if (stopwatch >= searchDelay) {
+            if (stopwatch >= searchDelay)
+            {
                 stopwatch = 0f;
                 target = SearchForTarget();
-                if (target) {
+                if (target)
+                {
                     indicator.targetTransform = target;
                 }
             }
@@ -63,7 +73,8 @@ namespace RaindropLobotomy.Utils {
 
     public class HurtboxTracker : Tracker
     {
-        public enum TargetType {
+        public enum TargetType
+        {
             Enemy,
             Friendly,
             All
@@ -84,7 +95,8 @@ namespace RaindropLobotomy.Utils {
             search.maxAngleFilter = maxSearchAngle;
             TeamMask mask = TeamMask.all;
 
-            switch (targetType) {
+            switch (targetType)
+            {
                 case TargetType.Enemy:
                     mask.RemoveTeam(userIndex);
                     break;
@@ -108,26 +120,31 @@ namespace RaindropLobotomy.Utils {
     public class ComponentTracker<T> : Tracker where T : Component
     {
         public Func<T, bool> validFilter = DefaultFilter;
-        private static bool DefaultFilter(T t) {
+        private static bool DefaultFilter(T t)
+        {
             return true;
         }
         public override Transform SearchForTarget()
         {
             T[] coms = GameObject.FindObjectsOfType<T>();
-            for (int i = 0; i < coms.Length; i++) {
+            for (int i = 0; i < coms.Length; i++)
+            {
                 T com = coms[i];
 
-                if (!validFilter(com)) {
+                if (!validFilter(com))
+                {
                     continue;
                 }
-                
-                if (Vector3.Distance(base.transform.position, com.transform.position) > maxSearchDistance) {
+
+                if (Vector3.Distance(base.transform.position, com.transform.position) > maxSearchDistance)
+                {
                     continue;
                 }
 
                 float dot = Vector3.Dot(inputBank.GetAimRay().direction, (com.transform.position - base.transform.position).normalized);
-        
-                if (dot < minDot) {
+
+                if (dot < minDot)
+                {
                     continue;
                 }
                 return com.transform;

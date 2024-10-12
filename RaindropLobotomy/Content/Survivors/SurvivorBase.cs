@@ -29,16 +29,18 @@ namespace RaindropLobotomy.Survivors
         public abstract SurvivorDef Survivor { get; }
         public abstract GameObject BodyPrefab { get; }
         public abstract GameObject MasterPrefab { get; }
-        
+
         public virtual void Create()
         {
             if (BodyPrefab) ContentAddition.AddBody(BodyPrefab);
             if (MasterPrefab) ContentAddition.AddMaster(MasterPrefab);
             if (Survivor) ContentAddition.AddSurvivorDef(Survivor);
 
-            if (BodyPrefab) {
+            if (BodyPrefab)
+            {
                 KinematicCharacterMotor motor = BodyPrefab.GetComponent<KinematicCharacterMotor>();
-                if (motor) {
+                if (motor)
+                {
                     motor.playerCharacter = true;
                 }
             }

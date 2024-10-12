@@ -1,7 +1,8 @@
 using System;
 using System.Reflection;
 
-namespace RaindropLobotomy.EGO.Gifts {
+namespace RaindropLobotomy.EGO.Gifts
+{
     public abstract class EGOGiftBase<T> : EGOGiftBase where T : EGOGiftBase<T>
     {
         public static T Instance { get; private set; }
@@ -13,13 +14,16 @@ namespace RaindropLobotomy.EGO.Gifts {
         }
     }
 
-    public abstract class EGOGiftBase {
+    public abstract class EGOGiftBase
+    {
         public abstract ItemDef ItemDef { get; }
         public abstract EquipmentDef EquipmentDef { get; }
         public static ItemTierDef EGOTier;
 
-        public void Initialize() {
-            if (!EGOTier) {
+        public void Initialize()
+        {
+            if (!EGOTier)
+            {
                 EGOTier = Load<ItemTierDef>("ITD_Gift.asset");
                 EGOTier.bgIconTexture = Paths.ItemTierDef.BossTierDef.bgIconTexture;
                 EGOTier.dropletDisplayPrefab = Paths.ItemTierDef.BossTierDef.dropletDisplayPrefab;
@@ -27,14 +31,16 @@ namespace RaindropLobotomy.EGO.Gifts {
 
                 ContentAddition.AddItemTierDef(EGOTier);
             }
-            
-            if (ItemDef) {
+
+            if (ItemDef)
+            {
                 ItemDef._itemTierDef = EGOTier;
                 ItemDef.tier = ItemTier.AssignedAtRuntime;
                 ContentAddition.AddItemDef(ItemDef);
             }
 
-            if (EquipmentDef) {
+            if (EquipmentDef)
+            {
                 ContentAddition.AddEquipmentDef(EquipmentDef);
                 EquipmentDef.isBoss = true;
                 /// EquipmentDef.GetType().GetProperty("bgIconTexture", (BindingFlags)(-1)).SetValue(EquipmentDef, Paths.Texture2D.texBossBGIcon);
@@ -60,7 +66,8 @@ namespace RaindropLobotomy.EGO.Gifts {
             }
         }
 
-        public virtual bool ActivateEquipment(EquipmentSlot slot) {
+        public virtual bool ActivateEquipment(EquipmentSlot slot)
+        {
             return false;
         }
     }

@@ -1,8 +1,10 @@
 using System;
 using UnityEngine.Rendering;
 
-namespace RaindropLobotomy.Survivors.Sweeper {
-    public class SprayFuel : BaseSkillState {
+namespace RaindropLobotomy.Survivors.Sweeper
+{
+    public class SprayFuel : BaseSkillState
+    {
         public Animator anim;
         public float duration;
         public float damageCoeff = 5f;
@@ -19,7 +21,8 @@ namespace RaindropLobotomy.Survivors.Sweeper {
         {
             base.FixedUpdate();
 
-            if (base.fixedAge >= duration) {
+            if (base.fixedAge >= duration)
+            {
                 outer.SetNextStateToMain();
             }
 
@@ -27,13 +30,15 @@ namespace RaindropLobotomy.Survivors.Sweeper {
 
             StartAimMode(0.5f);
 
-            if (anim.GetFloat("ejectSpray") >= 0.8f && !hasShot && base.isAuthority) {
+            if (anim.GetFloat("ejectSpray") >= 0.8f && !hasShot && base.isAuthority)
+            {
                 hasShot = true;
 
                 Transform muzzle = FindModelChild("MuzzleBacktank");
                 // EffectManager.SimpleEffect(Sweeper.AcidSprayEffect, muzzle.transform.position, Quaternion.LookRotation(muzzle.transform.up, muzzle.transform.forward), false);
                 bool crit = base.RollCrit();
-                for (int i = 0; i < 6; i++) {
+                for (int i = 0; i < 6; i++)
+                {
                     FireProjectileInfo info = new();
                     info.damage = base.damageStat * 0.8f;
                     info.position = muzzle.position;
@@ -41,11 +46,12 @@ namespace RaindropLobotomy.Survivors.Sweeper {
                     info.projectilePrefab = Sweeper.AcidGlob;
                     info.crit = crit;
                     info.owner = base.gameObject;
-                    
+
                     ProjectileManager.instance.FireProjectile(info);
                 }
 
-                if (Sweeper.Config.DoRecoil) {
+                if (Sweeper.Config.DoRecoil)
+                {
                     base.characterMotor.Motor.ForceUnground();
                     base.characterMotor.velocity = -base.inputBank.aimDirection * 26f;
                 }

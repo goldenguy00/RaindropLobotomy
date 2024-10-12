@@ -21,11 +21,13 @@ namespace RaindropLobotomy.Utils
             }
         }
 
-        public static ParticleSystemRenderer FindParticle(this GameObject self, string name) {
+        public static ParticleSystemRenderer FindParticle(this GameObject self, string name)
+        {
             return FindComponent<ParticleSystemRenderer>(self, name);
         }
 
-        public static T FindComponent<T>(this GameObject self, string name) where T : Component {
+        public static T FindComponent<T>(this GameObject self, string name) where T : Component
+        {
             return self.GetComponentsInChildren<T>().FirstOrDefault(x => x.gameObject.name == name);
         }
 
@@ -36,19 +38,23 @@ namespace RaindropLobotomy.Utils
             return (T)inst?.Invoke(obj, null);
         }
 
-        public static void MakeAbideByScale(this ParticleSystem self) {
+        public static void MakeAbideByScale(this ParticleSystem self)
+        {
             ParticleSystem.MainModule main = self.main;
             main.scalingMode = ParticleSystemScalingMode.Hierarchy;
         }
 
-        public static void MakeAbideByScaleRecursively(this GameObject self) {
-            foreach (ParticleSystem system in self.GetComponentsInChildren<ParticleSystem>()) {
+        public static void MakeAbideByScaleRecursively(this GameObject self)
+        {
+            foreach (ParticleSystem system in self.GetComponentsInChildren<ParticleSystem>())
+            {
                 system.MakeAbideByScale();
             }
         }
 
-        public static Vector3 Nullify(this Vector3 self, bool x, bool y, bool z) {
-            return new Vector3(x ? 0f: self.x, y ? 0f : self.y, z ? 0f : self.z);
+        public static Vector3 Nullify(this Vector3 self, bool x, bool y, bool z)
+        {
+            return new Vector3(x ? 0f : self.x, y ? 0f : self.y, z ? 0f : self.z);
         }
 
         public static void RemoveComponent<T>(this Component self) where T : Component

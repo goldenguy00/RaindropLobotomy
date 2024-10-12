@@ -1,13 +1,15 @@
 using System;
 
-namespace RaindropLobotomy.Enemies.Fragment {
-    public class Scream : BaseSkillState {
+namespace RaindropLobotomy.Enemies.Fragment
+{
+    public class Scream : BaseSkillState
+    {
         private float duration = 10f;
         private int pulses = 7;
         private float damageCoeff = 4f;
         private float pulseDelay => duration / pulses;
         private Timer pulse;
-        
+
         public override void OnEnter()
         {
             base.OnEnter();
@@ -27,19 +29,22 @@ namespace RaindropLobotomy.Enemies.Fragment {
         public override void FixedUpdate()
         {
             base.FixedUpdate();
-            
-            if (base.fixedAge >= duration) {
+
+            if (base.fixedAge >= duration)
+            {
                 outer.SetNextStateToMain();
             }
 
-            if (pulse.Tick()) {
+            if (pulse.Tick())
+            {
                 pulse.Reset();
 
                 if (!FindModelChild("Flower")) return;
 
                 Vector3 pos = FindModelChild("Flower").position;
 
-                EffectManager.SpawnEffect(UniverseFragment.ScreamEffect, new EffectData {
+                EffectManager.SpawnEffect(UniverseFragment.ScreamEffect, new EffectData
+                {
                     origin = pos,
                     scale = 3f
                 }, false);
@@ -58,7 +63,8 @@ namespace RaindropLobotomy.Enemies.Fragment {
                 attack.damageType = DamageType.SlowOnHit;
                 attack.baseForce = 40f;
 
-                if (base.isAuthority) {
+                if (base.isAuthority)
+                {
                     attack.Fire();
                 }
             }
@@ -73,7 +79,8 @@ namespace RaindropLobotomy.Enemies.Fragment {
             base.characterDirection.enabled = true;
 
             AkSoundEngine.PostEvent("Stop_fragment_scream", base.gameObject);
-            if (GetModelAnimator()) {
+            if (GetModelAnimator())
+            {
                 GetModelAnimator().SetBool("isScreaming", false);
             }
         }

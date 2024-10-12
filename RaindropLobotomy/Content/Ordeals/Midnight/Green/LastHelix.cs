@@ -41,7 +41,8 @@ namespace RaindropLobotomy.Ordeals.Midnight.Green
         }
     }
 
-    public class PlasmaDamage : MonoBehaviour {
+    public class PlasmaDamage : MonoBehaviour
+    {
         public CharacterBody owner;
         public float damagePerSecond;
         private int ticksPerSecond = 5;
@@ -49,7 +50,8 @@ namespace RaindropLobotomy.Ordeals.Midnight.Green
         private float stopwatch = 0f;
         private float damage => damagePerSecond / ticksPerSecond;
         private OverlapAttack attack;
-        public void Start() {
+        public void Start()
+        {
             attack = new();
             attack.damage = damage;
             attack.attacker = owner.gameObject;
@@ -59,11 +61,14 @@ namespace RaindropLobotomy.Ordeals.Midnight.Green
             attack.isCrit = false;
         }
 
-        public void FixedUpdate() {
-            if (NetworkServer.active) {
+        public void FixedUpdate()
+        {
+            if (NetworkServer.active)
+            {
                 stopwatch += Time.fixedDeltaTime;
 
-                if (stopwatch >= delay) {
+                if (stopwatch >= delay)
+                {
                     stopwatch = 0f;
                     attack.ResetIgnoredHealthComponents();
                     attack.Fire();

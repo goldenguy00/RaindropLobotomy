@@ -35,13 +35,16 @@ namespace RaindropLobotomy.EGO
         public SurvivorVariantDef EGO;
         public virtual string RequiresAbsentMod { get; } = null;
         public virtual string RequiresMod { get; } = null;
-        public bool AreWeAllowedToLoad() {
-            if (RequiresAbsentMod != null && MainConfig.SuppressDuplicateVariants) {
+        public bool AreWeAllowedToLoad()
+        {
+            if (RequiresAbsentMod != null && MainConfig.SuppressDuplicateVariants)
+            {
                 Debug.Log(BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(RequiresAbsentMod));
                 return !BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(RequiresAbsentMod);
             }
 
-            if (RequiresMod != null) {
+            if (RequiresMod != null)
+            {
                 Debug.Log(BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(RequiresMod));
                 return BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(RequiresMod);
             }
@@ -69,7 +72,8 @@ namespace RaindropLobotomy.EGO
             SurvivorVariantCatalog.AddSurvivorVariant(EGO);
         }
 
-        public SurvivorDef CreateSurvivorDef(GameObject body, GameObject display, string name, string desc, string outroLoss = "", string outroWin = "") {
+        public SurvivorDef CreateSurvivorDef(GameObject body, GameObject display, string name, string desc, string outroLoss = "", string outroWin = "")
+        {
             SurvivorDef def = ScriptableObject.CreateInstance<SurvivorDef>();
             def.bodyPrefab = body;
             def.displayPrefab = display;
@@ -82,7 +86,8 @@ namespace RaindropLobotomy.EGO
             return def;
         }
 
-        public void ReplaceSkill(GenericSkill slot, SkillFamily family) {
+        public void ReplaceSkill(GenericSkill slot, SkillFamily family)
+        {
             slot._skillFamily = family;
         }
     }

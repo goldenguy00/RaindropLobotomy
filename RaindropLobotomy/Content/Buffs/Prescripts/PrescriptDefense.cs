@@ -2,10 +2,11 @@ using System;
 using RaindropLobotomy.EGO.Merc;
 using RoR2.Orbs;
 
-namespace RaindropLobotomy.Buffs {
+namespace RaindropLobotomy.Buffs
+{
     public class PrescriptDefense : BuffBase<PrescriptDefense>
     {
-        public override BuffDef Buff => Load<BuffDef>("bdPrescriptDefense.asset");
+        public override BuffDef Buff { get; set; } = Load<BuffDef>("bdPrescriptDefense.asset");
 
         public override void PostCreation()
         {
@@ -16,8 +17,10 @@ namespace RaindropLobotomy.Buffs {
         private void OnStruck(DamageReport report)
         {
             float mult = report.victimBodyIndex == IndexMerc.IndexGiantFistBody ? 2f : 1f;
-            if (report.attackerBody && report.victimBody) {
-                if (report.victimBody.HasBuff(Buff)) {
+            if (report.attackerBody && report.victimBody)
+            {
+                if (report.victimBody.HasBuff(Buff))
+                {
                     LightningOrb orb = new();
                     orb.lightningType = LightningOrb.LightningType.RazorWire;
                     orb.damageValue = report.victimBody.baseDamage * 2f * mult;
@@ -38,7 +41,8 @@ namespace RaindropLobotomy.Buffs {
 
         private void IncreaseStats(CharacterBody sender, StatHookEventArgs args)
         {
-            if (sender.HasBuff(Buff) && sender.healthComponent) {
+            if (sender.HasBuff(Buff) && sender.healthComponent)
+            {
                 args.armorAdd += 50;
                 args.regenMultAdd += 3.5f;
                 args.baseShieldAdd += sender.healthComponent.fullCombinedHealth * 0.25f;

@@ -1,14 +1,17 @@
 using System;
 using System.Linq;
 
-namespace RaindropLobotomy.Enemies {
-    public interface Abnormality {
-        RiskLevel ThreatLevel { get;}
+namespace RaindropLobotomy.Enemies
+{
+    public interface Abnormality
+    {
+        RiskLevel ThreatLevel { get; }
         SpawnCard SpawnCard { get; }
         bool IsTool { get; }
     }
 
-    public enum RiskLevel {
+    public enum RiskLevel
+    {
         Zayin = 0,
         Teth = 1,
         He = 2,
@@ -16,27 +19,31 @@ namespace RaindropLobotomy.Enemies {
         Aleph = 4
     }
 
-    public static class AbnormalityManager {
-        public static List<Abnormality> Abnormalities = new();
+    public static class AbnormalityManager
+    {
+        public static List<Abnormality> Abnormalities = [];
         //
-        private static List<Abnormality> SpawnedLastStage = new();
+        private static List<Abnormality> SpawnedLastStage = [];
         //
         private static int[] CreditMap = { 220, 420, 650, 1000, 2500 };
         private static DirectorCardCategorySelection AbnoDCCS;
         private static GameObject AbnoDirector;
-        public static void Initialize() {
+        public static void Initialize()
+        {
             AbnoDCCS = Load<DirectorCardCategorySelection>("AbnoDCCS.asset");
             AbnoDirector = Load<GameObject>("AbnormalityDirector.prefab");
 
-            On.RoR2.CombatDirector.Awake += OnDirectorStart;
-            On.RoR2.CombatDirector.Spawn += PerStage;
+            // gameobject.find is illegal
+            //On.RoR2.CombatDirector.Awake += OnDirectorStart;
+            //On.RoR2.CombatDirector.Spawn += PerStage;
         }
 
         private static bool PerStage(On.RoR2.CombatDirector.orig_Spawn orig, CombatDirector self, SpawnCard spawnCard, EliteDef eliteDef, Transform spawnTarget, DirectorCore.MonsterSpawnDistance spawnDistance, bool preventOverhead, float valueMultiplier, DirectorPlacementRule.PlacementMode placementMode)
         {
             bool j = orig(self, spawnCard, eliteDef, spawnTarget, spawnDistance, preventOverhead, valueMultiplier, placementMode);
 
-            if (self.customName == "Abnormality") {
+            if (self.customName == "Abnormality")
+            {
                 self.enabled = false;
             }
 
@@ -47,20 +54,24 @@ namespace RaindropLobotomy.Enemies {
         {
             orig(self);
 
-            if (!GameObject.Find("AbnormalityDirector(Clone)") && Abnormalities.Where(x => !x.IsTool).Count() > 0) {
+            if (!GameObject.Find("AbnormalityDirector(Clone)") && Abnormalities.Where(x => !x.IsTool).Count() > 0)
+            {
                 GameObject dir = GameObject.Instantiate(AbnoDirector);
             }
         }
 
-        public static void AddAbnormality(Abnormality abno) {
+        public static void AddAbnormality(Abnormality abno)
+        {
             // Debug.Log("Adding abnormality: " + abno.SpawnCard);
 
-            if (abno.IsTool) {
+            if (abno.IsTool)
+            {
                 HandleAbno_Tool(abno);
                 return;
             }
 
-            switch (abno.ThreatLevel) {
+            switch (abno.ThreatLevel)
+            {
                 case RiskLevel.Zayin:
                     break; // all of these are tools
                 case RiskLevel.Teth:
@@ -72,24 +83,28 @@ namespace RaindropLobotomy.Enemies {
                     HandleAbno_Aleph(abno);
                     break;
             }
-            
+
             abno.SpawnCard.directorCreditCost = CreditMap[(int)abno.ThreatLevel];
         }
 
-        private static void HandleAbno_Aleph(Abnormality abno) {
+        private static void HandleAbno_Aleph(Abnormality abno)
+        {
 
         }
 
-        private static void HandleAbno_Tool(Abnormality abno) {
+        private static void HandleAbno_Tool(Abnormality abno)
+        {
 
         }
 
-        private static void HandleAbno_Standard(Abnormality abno) {
+        private static void HandleAbno_Standard(Abnormality abno)
+        {
             int index = (int)abno.ThreatLevel - 1;
 
             DirectorCard card = new();
             card.selectionWeight = 1;
-            card.minimumStageCompletions = abno.ThreatLevel switch {
+            card.minimumStageCompletions = abno.ThreatLevel switch
+            {
                 RiskLevel.Zayin => 0,
                 RiskLevel.Teth => 0,
                 RiskLevel.He => 0,

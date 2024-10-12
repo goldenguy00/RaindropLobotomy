@@ -1,8 +1,11 @@
 using System;
 
-namespace RaindropLobotomy.Enemies.SingingMachine {
-    public class SingingMachineMain : GenericCharacterMain {
-        public enum SingingMachineLidState {
+namespace RaindropLobotomy.Enemies.SingingMachine
+{
+    public class SingingMachineMain : GenericCharacterMain
+    {
+        public enum SingingMachineLidState
+        {
             Open,
             Closed,
         }
@@ -36,12 +39,14 @@ namespace RaindropLobotomy.Enemies.SingingMachine {
         {
             base.FixedUpdate();
 
-            if (!hinge) {
+            if (!hinge)
+            {
                 hinge = GetModelChildLocator().FindChild("Hinge");
                 return;
             }
 
-            switch (lidState) {
+            switch (lidState)
+            {
                 case SingingMachineLidState.Open:
                     x += (xRotOpen / 0.2f) * Time.fixedDeltaTime;
                     break;
@@ -50,11 +55,14 @@ namespace RaindropLobotomy.Enemies.SingingMachine {
                     break;
             };
 
-            if (lidState == SingingMachineLidState.Open) {
+            if (lidState == SingingMachineLidState.Open)
+            {
                 stopwatch += Time.fixedDeltaTime;
-                if (stopwatch >= (1f / hitrate)) {
+                if (stopwatch >= (1f / hitrate))
+                {
                     stopwatch = 0f;
-                    if (base.isAuthority) {
+                    if (base.isAuthority)
+                    {
                         attack.ResetIgnoredHealthComponents();
                         attack.Fire();
                     }
@@ -65,8 +73,10 @@ namespace RaindropLobotomy.Enemies.SingingMachine {
             hinge.localRotation = Quaternion.Euler(x, 0f, 0f);
         }
 
-        public void UpdateLidState(SingingMachineLidState newState) {
-            if (disallowLidStateChange) {
+        public void UpdateLidState(SingingMachineLidState newState)
+        {
+            if (disallowLidStateChange)
+            {
                 return;
             }
 

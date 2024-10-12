@@ -1,14 +1,15 @@
 using RoR2;
 using R2API;
 
-namespace RaindropLobotomy.EGO {
+namespace RaindropLobotomy.EGO
+{
     public class SolemnLament : EGOSkillBase
     {
-        public override SkillDef SkillDef => Load<SteppedSkillDef>("sdSolemnLament.asset");
-        public override SurvivorDef Survivor => Paths.SurvivorDef.Commando;
+        public override SkillDef SkillDef { get; set; } = Load<SteppedSkillDef>("sdSolemnLament.asset");
+        public override SurvivorDef Survivor { get; set; } = Paths.SurvivorDef.Commando;
 
-        public override SkillSlot Slot => SkillSlot.Primary;
-        public override UnlockableDef Unlock => null;
+        public override SkillSlot Slot { get; set; } = SkillSlot.Primary;
+        public override UnlockableDef Unlock { get; set; } = null;
         public GameObject lament;
         public Material matLamentWhite;
         public Material matLamentBlack;
@@ -20,13 +21,15 @@ namespace RaindropLobotomy.EGO {
         public override void OnSkillChangeUpdate(CharacterModel model, bool equipped)
         {
             RendererStore store = GetRendererStore(model);
-            if (!equipped) {
+            if (!equipped)
+            {
                 // Debug.Log("reloading from store");
                 store.noUpdateIndices = new int[0];
                 ReloadFromStore(model.baseRendererInfos[0], store[0]);
                 ReloadFromStore(model.baseRendererInfos[1], store[1]);
             }
-            else {
+            else
+            {
                 // Debug.Log("loading gun replacements");
                 store.noUpdateIndices = new int[] { 0, 1 };
                 model.baseRendererInfos[0].defaultMaterial = matLamentBlack;
@@ -55,7 +58,7 @@ namespace RaindropLobotomy.EGO {
             ContentAddition.AddEffect(Load<GameObject>("LamentImpactBlack.prefab"));
             ContentAddition.AddBuffDef(Seal);
             ContentAddition.AddBuffDef(SealStack);
-            
+
             LanguageAPI.Add("RL_KEYWORD_LAMENT", "Lament");
             LanguageAPI.Add("RL_SOLEMNLAMENT_NAME", "Solemn Lament");
             LanguageAPI.Add("RL_SOLEMNLAMENT_DESC", "Fire slow, alternating shots for <style=cIsDamage>145% damage</style> that <style=cIsUtility>seal</style> targets. Deals additional damage against <style=cIsUtility>fully sealed</style> targets.");
@@ -70,16 +73,19 @@ namespace RaindropLobotomy.EGO {
             bool isAlreadySealed = report.victimBody.HasBuff(Seal);
             if (isAlreadySealed) return;
 
-            if (report.damageInfo.HasModdedDamageType(LamentType)) {
+            if (report.damageInfo.HasModdedDamageType(LamentType))
+            {
                 report.victimBody.AddTimedBuff(SealStack, 10f);
 
-                if (report.victimBody.GetBuffCount(SealStack) >= 5) {
+                if (report.victimBody.GetBuffCount(SealStack) >= 5)
+                {
                     report.victimBody.SetBuffCount(SealStack.buffIndex, 0);
                     report.victimBody.AddTimedBuff(Seal, 3f);
                     EffectManager.SimpleEffect(Paths.GameObject.OmniImpactExecute, report.damageInfo.position, Quaternion.identity, false);
-                    
+
                     SetStateOnHurt hurt = report.victimBody.GetComponent<SetStateOnHurt>();
-                    if (hurt) {
+                    if (hurt)
+                    {
                         hurt.SetStun(3f);
                     }
                 }
@@ -97,9 +103,8 @@ namespace RaindropLobotomy.EGO {
         private float DamageCoefficient = 1.4f;
         private float DamageCoefficientSealedTarget = 5.7f;
         private float ShotsPerSecond = 1.5f;
-        private GameObject ImpactWhite => Load<GameObject>("LamentImpactWhite.prefab");
-        private GameObject ImpactBlack => Load<GameObject>("LamentImpactBlack.prefab");
-        private float Duration => 1f / ShotsPerSecond;
+        private GameObject ImpactWhite = Load<GameObject>("LamentImpactWhite.prefab");
+        private GameObject ImpactBlack = Load<GameObject>("LamentImpactBlack.prefab");
         //
         private int pistol;
         private float duration;
@@ -125,7 +130,7 @@ namespace RaindropLobotomy.EGO {
                 AkSoundEngine.PostEvent("Play_butterflyShot_white", base.gameObject);
             }
 
-            duration = Duration / base.attackSpeedStat;
+            duration = (1f / ShotsPerSecond) / base.attackSpeedStat;
         }
 
         public override void FixedUpdate()
@@ -133,7 +138,8 @@ namespace RaindropLobotomy.EGO {
             base.FixedUpdate();
             base.characterBody.SetAimTimer(0.2f);
 
-            if (base.fixedAge >= duration) {
+            if (base.fixedAge >= duration)
+            {
                 outer.SetNextStateToMain();
             }
         }
@@ -143,10 +149,12 @@ namespace RaindropLobotomy.EGO {
             return InterruptPriority.PrioritySkill;
         }
 
-        public void FireBullet(string muzzle) {
+        public void FireBullet(string muzzle)
+        {
             EffectManager.SimpleMuzzleFlash(Paths.GameObject.MuzzleflashBarrage, base.gameObject, muzzle, false);
 
-            if (isAuthority) {
+            if (isAuthority)
+            {
                 BulletAttack bulletAttack = new();
                 bulletAttack.owner = base.gameObject;
                 bulletAttack.weapon = base.gameObject;
@@ -163,13 +171,16 @@ namespace RaindropLobotomy.EGO {
                 bulletAttack.radius = 0.1f;
                 bulletAttack.smartCollision = true;
                 bulletAttack.AddModdedDamageType(SolemnLament.LamentType);
-                bulletAttack.hitCallback = (BulletAttack attack, ref BulletAttack.BulletHit hit) => {
+                bulletAttack.hitCallback = (BulletAttack attack, ref BulletAttack.BulletHit hit) =>
+                {
                     float coefficient = DamageCoefficient;
 
-                    if (hit.hitHurtBox && hit.hitHurtBox.healthComponent) {
+                    if (hit.hitHurtBox && hit.hitHurtBox.healthComponent)
+                    {
                         CharacterBody body = hit.hitHurtBox.healthComponent.body;
 
-                        if (body.HasBuff(SolemnLament.Seal)) {
+                        if (body.HasBuff(SolemnLament.Seal))
+                        {
                             coefficient = DamageCoefficientSealedTarget;
                             attack.damageColorIndex = DamageColorIndex.Void;
                         }

@@ -1,8 +1,10 @@
 using System;
 using RoR2.CharacterAI;
 
-namespace RaindropLobotomy.Ordeals.Midnight.Green {
-    public class BeamState : BaseHelixWeapon {
+namespace RaindropLobotomy.Ordeals.Midnight.Green
+{
+    public class BeamState : BaseHelixWeapon
+    {
         public GameObject laserInst1;
         public Transform endPointC;
 
@@ -22,8 +24,10 @@ namespace RaindropLobotomy.Ordeals.Midnight.Green {
         private bool summonedDeathRay = false;
         private BaseAI ai;
         private Vector3 position;
-        private Transform target {
-            get {
+        private Transform target
+        {
+            get
+            {
                 return ai.currentEnemy.gameObject?.transform ?? null;
             }
         }
@@ -35,21 +39,25 @@ namespace RaindropLobotomy.Ordeals.Midnight.Green {
         private float damageCoeff = 6f / 10;
         private Transform endpointD;
 
-        private class LaserPattern {
+        private class LaserPattern
+        {
             Vector3[] points;
             int currentPoint;
             public bool isDone;
             public float speed;
             private float belowMapPos = -300f;
 
-            public LaserPattern(Vector3[] targetPoints) {
+            public LaserPattern(Vector3[] targetPoints)
+            {
                 points = targetPoints;
                 currentPoint = 0;
                 isDone = false;
             }
 
-            public Vector3 Update(Vector3 current) {
-                if (currentPoint > points.Length - 1) {
+            public Vector3 Update(Vector3 current)
+            {
+                if (currentPoint > points.Length - 1)
+                {
                     // Debug.Log("Points have all been iterated, marking this pattern as done.");
                     currentPoint = points.Length - 1;
                     isDone = true;
@@ -58,7 +66,8 @@ namespace RaindropLobotomy.Ordeals.Midnight.Green {
                 Vector3 output = points[currentPoint];
                 output.y = belowMapPos;
 
-                if (Vector3.Distance(current, output) < 1f) {
+                if (Vector3.Distance(current, output) < 1f)
+                {
                     currentPoint++;
                 }
 
@@ -100,7 +109,8 @@ namespace RaindropLobotomy.Ordeals.Midnight.Green {
         {
             base.FixedUpdate();
 
-            if (!chargeUpTimer.Tick()) {
+            if (!chargeUpTimer.Tick())
+            {
                 // Debug.Log("rizzing up that charge timer");
 
                 // Debug.Log(mult);
@@ -111,7 +121,8 @@ namespace RaindropLobotomy.Ordeals.Midnight.Green {
 
                 particleSystem.localScale = Vector3.one * mult;
             }
-            else if (!summonedDeathRay) {
+            else if (!summonedDeathRay)
+            {
                 Vector3 random = GetRandomPositionIgnoreNodegraph(base.transform.position, 40f, 70f);
 
                 beam2 = GameObject.Instantiate(LastHelix.LaserPrefab, new(random.x, belowMapPos, random.z), Quaternion.identity);
@@ -124,7 +135,8 @@ namespace RaindropLobotomy.Ordeals.Midnight.Green {
                 ai.FindEnemyHurtBox(4000f, true, false);
             }
 
-            if ((currentPattern == null || currentPattern.isDone) && summonedDeathRay) {
+            if ((currentPattern == null || currentPattern.isDone) && summonedDeathRay)
+            {
                 Vector3[] nodes = LastHelixLaserPatterns.GetSpiralPointSet(GetRandomPositionIgnoreNodegraph(base.transform.position, 40f, 240f), 140f, 35f, 3);
 
                 beam2.transform.position = nodes[0];
@@ -135,25 +147,29 @@ namespace RaindropLobotomy.Ordeals.Midnight.Green {
                 };
             }
 
-            if (bullet.Tick() && summonedDeathRay && NetworkServer.active) {
+            if (bullet.Tick() && summonedDeathRay && NetworkServer.active)
+            {
                 GetBulletAttack(muzzleV, Vector3.up, base.damageStat * damageCoeff, 3f).Fire();
                 GetBulletAttack(endpointD, Vector3.down, base.damageStat * damageCoeff, 3f).Fire();
             }
 
 
-            if (currentPattern != null && !currentPattern.isDone && summonedDeathRay) {
+            if (currentPattern != null && !currentPattern.isDone && summonedDeathRay)
+            {
                 Vector3 output = currentPattern.Update(beam2.transform.position);
 
                 Vector3 next = Vector3.MoveTowards(beam2.transform.position, output, currentPattern.speed * Time.fixedDeltaTime);
 
                 beam2.transform.position = next;
 
-                if (plasmaDepositInterval.Tick()) {
+                if (plasmaDepositInterval.Tick())
+                {
                     Vector3 plasmaTrailRaycastPoint = next + (Vector3.up * 900f);
 
                     RaycastHit[] hits = Physics.SphereCastAll(plasmaTrailRaycastPoint, 0.2f, Vector3.down, 4000f, LayerIndex.world.mask);
 
-                    foreach (RaycastHit hit in hits) {
+                    foreach (RaycastHit hit in hits)
+                    {
                         GameObject prefab = GameObject.Instantiate(LastHelix.PlasmaPrefab, hit.point, Quaternion.identity);
                         PlasmaDamage plasma = prefab.GetComponent<PlasmaDamage>();
                         plasma.owner = base.characterBody;
@@ -163,11 +179,13 @@ namespace RaindropLobotomy.Ordeals.Midnight.Green {
             }
         }
 
-        public Vector3 GetRandomPositionIgnoreNodegraph(Vector3 origin, float min, float max, int attempts = 0) {
+        public Vector3 GetRandomPositionIgnoreNodegraph(Vector3 origin, float min, float max, int attempts = 0)
+        {
             Vector3 dirVec = Vector3.zero;
 
             // generate a random forward vector
-            while (dirVec == Vector3.zero) {
+            while (dirVec == Vector3.zero)
+            {
                 dirVec = new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f));
             }
 
@@ -176,18 +194,21 @@ namespace RaindropLobotomy.Ordeals.Midnight.Green {
 
             Vector3 pos = ValidatePosition(origin + (dirVec * dist));
 
-            if (pos == base.transform.position && attempts < 20) {
+            if (pos == base.transform.position && attempts < 20)
+            {
                 // invalid spot, reroll (up to a limit)
                 return GetRandomPositionIgnoreNodegraph(origin, min, max, attempts + 1);
             }
-            
+
             return pos;
         }
 
-        public Vector3 ValidatePosition(Vector3 position) {
+        public Vector3 ValidatePosition(Vector3 position)
+        {
             Vector3 pos = position;
 
-            if (Physics.Raycast(pos + (Vector3.up * 10f), Vector3.down, out RaycastHit hit, 200f, LayerIndex.world.mask)) {
+            if (Physics.Raycast(pos + (Vector3.up * 10f), Vector3.down, out RaycastHit hit, 200f, LayerIndex.world.mask))
+            {
                 return hit.point;
             }
 

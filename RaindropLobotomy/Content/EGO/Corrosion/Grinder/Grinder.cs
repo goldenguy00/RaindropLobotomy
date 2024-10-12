@@ -1,7 +1,8 @@
 using System;
 using RoR2.UI;
 
-namespace RaindropLobotomy.EGO.Toolbot {
+namespace RaindropLobotomy.EGO.Toolbot
+{
     public class Grinder : CorrosionBase<Grinder>
     {
         public override string EGODisplayName => "Grinder MK. 5-2";
@@ -25,9 +26,9 @@ namespace RaindropLobotomy.EGO.Toolbot {
         //
         public static BuffDef Charge;
         //
-        public LazyIndex GrinderIndex = new("GrinderBody");
-        public SkillDef Clean;
-        public SkillDef NoLimit;
+        public static LazyIndex GrinderIndex = new("GrinderBody");
+        public static SkillDef Clean;
+        public static SkillDef NoLimit;
 
         // TODO:
         // Tweak blood splatter textures
@@ -63,26 +64,29 @@ namespace RaindropLobotomy.EGO.Toolbot {
             RecalculateStatsAPI.GetStatCoefficients += ChargeStats;
         }
 
-        private void ChargeStats(CharacterBody sender, StatHookEventArgs args)
+        private static void ChargeStats(CharacterBody sender, StatHookEventArgs args)
         {
             int c = sender.GetBuffCount(Charge);
-            float mult = c * 0.035f;
-
-            if (c > 0) {
-                args.moveSpeedMultAdd += mult;
+            if (c > 0)
+            {
+                args.moveSpeedMultAdd += c * 0.035f;
             }
         }
 
-        private bool ChargeBlocker(On.RoR2.Skills.SkillDef.orig_IsReady orig, RoR2.Skills.SkillDef self, GenericSkill skillSlot)
+        private static bool ChargeBlocker(On.RoR2.Skills.SkillDef.orig_IsReady orig, RoR2.Skills.SkillDef self, GenericSkill skillSlot)
         {
-            if (self == Clean) {
-                if (skillSlot.characterBody.GetBuffCount(Charge) < 3) {
+            if (self == Clean)
+            {
+                if (skillSlot.characterBody.GetBuffCount(Charge) < 3)
+                {
                     return false;
                 }
             }
 
-            if (self == NoLimit) {
-                if (skillSlot.characterBody.GetBuffCount(Charge) < 10) {
+            if (self == NoLimit)
+            {
+                if (skillSlot.characterBody.GetBuffCount(Charge) < 10)
+                {
                     return false;
                 }
             }
@@ -90,9 +94,10 @@ namespace RaindropLobotomy.EGO.Toolbot {
             return orig(self, skillSlot);
         }
 
-        private void OnInflictDOT(On.RoR2.DotController.orig_AddDot orig, DotController self, GameObject attackerObject, float duration, DotController.DotIndex dotIndex, float damageMultiplier, uint? maxStacksFromAttacker, float? totalDamage, DotController.DotIndex? preUpgradeDotIndex)
+        private static void OnInflictDOT(On.RoR2.DotController.orig_AddDot orig, DotController self, GameObject attackerObject, float duration, DotController.DotIndex dotIndex, float damageMultiplier, uint? maxStacksFromAttacker, float? totalDamage, DotController.DotIndex? preUpgradeDotIndex)
         {
-            if (dotIndex == DotController.DotIndex.Bleed && self.victimBody && attackerObject && attackerObject.GetComponent<CharacterBody>().bodyIndex == GrinderIndex) {
+            if (dotIndex == DotController.DotIndex.Bleed && self.victimBody && attackerObject && attackerObject.GetComponent<CharacterBody>()?.bodyIndex == GrinderIndex)
+            {
                 float multiplier = 1f + (self.victimBody.GetBuffCount(RoR2Content.Buffs.Bleeding) * 0.05f);
                 damageMultiplier = multiplier;
             }
@@ -100,17 +105,20 @@ namespace RaindropLobotomy.EGO.Toolbot {
             orig(self, attackerObject, duration, dotIndex, damageMultiplier, maxStacksFromAttacker, totalDamage, preUpgradeDotIndex);
         }
 
-        public static void IncreaseCharge(CharacterBody body) {
+        public static void IncreaseCharge(CharacterBody body)
+        {
             int count = body.GetBuffCount(Charge) + 1;
             UpdateCharge(body, count);
         }
 
-        public static void DecreaseCharge(CharacterBody body, int amount) {
+        public static void DecreaseCharge(CharacterBody body, int amount)
+        {
             int count = body.GetBuffCount(Charge) - amount;
             UpdateCharge(body, count);
         }
 
-        public static void UpdateCharge(CharacterBody body, int count) {
+        public static void UpdateCharge(CharacterBody body, int count)
+        {
             count = Mathf.Clamp(count, 0, 10);
             body.SetBuffCount(Charge.buffIndex, count);
         }

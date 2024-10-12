@@ -1,6 +1,7 @@
 using System;
 
-namespace RaindropLobotomy.Enemies.Claw {
+namespace RaindropLobotomy.Enemies.Claw
+{
     public class Claw : EnemyBase<Claw>
     {
         public override string ConfigName => "A Claw";

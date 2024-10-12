@@ -1,7 +1,8 @@
 using System;
 using EntityStates.AffixVoid;
 
-namespace RaindropLobotomy.EGO.FalseSon {
+namespace RaindropLobotomy.EGO.FalseSon
+{
     public class EGOJustitia : CorrosionBase<EGOJustitia>
     {
         public override string EGODisplayName => "Justitia";
@@ -39,7 +40,8 @@ namespace RaindropLobotomy.EGO.FalseSon {
             SharedSetup();
         }
 
-        public static void SharedSetup() {
+        public static void SharedSetup()
+        {
             if (AirSlashProjectile) return;
 
             AirSlashProjectile = Load<GameObject>("JustitiaAirSlash.prefab");
@@ -59,7 +61,8 @@ namespace RaindropLobotomy.EGO.FalseSon {
 
         private static void DoubleDebuffs(On.RoR2.CharacterBody.orig_AddTimedBuff_BuffDef_float orig, CharacterBody self, BuffDef buffDef, float duration)
         {
-            if (HasTatteredBandages(self) && buffDef.isDebuff) {
+            if (self.bodyIndex == JustitiaBody && buffDef.isDebuff)
+            {
                 duration *= 2f;
             }
 
@@ -70,7 +73,8 @@ namespace RaindropLobotomy.EGO.FalseSon {
         {
             DotController.DotStack stack = dotStack as DotController.DotStack;
 
-            if (self.victimBody && HasTatteredBandages(self.victimBody)) {
+            if (self.victimBody && self.victimBody.bodyIndex == JustitiaBody)
+            {
                 stack.timer *= 2f;
             }
 
@@ -79,7 +83,8 @@ namespace RaindropLobotomy.EGO.FalseSon {
 
         private static void ImmuneToDOT(On.RoR2.HealthComponent.orig_TakeDamage orig, HealthComponent self, DamageInfo damageInfo)
         {
-            if (damageInfo.damageType.damageType.HasFlag(DamageType.DoT) && HasTatteredBandages(self.body)) {
+            if (damageInfo.damageType.damageType.HasFlag(DamageType.DoT) && self.body.bodyIndex == JustitiaBody)
+            {
                 damageInfo.rejected = true;
             }
 
@@ -115,20 +120,21 @@ namespace RaindropLobotomy.EGO.FalseSon {
             );
         }
 
-        public static bool HasTatteredBandages(CharacterBody body) {
-            return body.bodyIndex == JustitiaBody;
-        }
-
-        public static bool AffectedByAnyDebuff(CharacterBody body) {
-            foreach (BuffIndex index in BuffCatalog.debuffBuffIndices) {
+        public static bool AffectedByAnyDebuff(CharacterBody body)
+        {
+            foreach (BuffIndex index in BuffCatalog.debuffBuffIndices)
+            {
                 if (body.HasBuff(index)) return true;
             }
 
             DotController dot = DotController.FindDotController(body.gameObject);
 
-            if (dot) {
-                for (DotController.DotIndex index = DotController.DotIndex.Bleed; index < DotController.DotIndex.Count; index++) {
-                    if (dot.HasDotActive(index)) {
+            if (dot)
+            {
+                for (DotController.DotIndex index = DotController.DotIndex.Bleed; index < DotController.DotIndex.Count; index++)
+                {
+                    if (dot.HasDotActive(index))
+                    {
                         return true;
                     }
                 }

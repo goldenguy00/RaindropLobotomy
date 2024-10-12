@@ -1,7 +1,8 @@
 using System;
 
-namespace RaindropLobotomy.EGO.Commando {
-    public class Lament: BaseSkillState, SteppedSkillDef.IStepSetter
+namespace RaindropLobotomy.EGO.Commando
+{
+    public class Lament : BaseSkillState, SteppedSkillDef.IStepSetter
     {
         private float DamageCoefficient = 2.5f;
         private float ShotsPerSecond = 1f;
@@ -20,15 +21,19 @@ namespace RaindropLobotomy.EGO.Commando {
         {
             base.OnEnter();
 
-            if (!SolemnLament.config.ReplaceSoundEffects) {
-                if (pistol % 2 == 0) {
+            if (!SolemnLament.config.ReplaceSoundEffects)
+            {
+                if (pistol % 2 == 0)
+                {
                     AkSoundEngine.PostEvent("Play_butterflyShot_black", base.gameObject);
                 }
-                else {
+                else
+                {
                     AkSoundEngine.PostEvent("Play_butterflyShot_white", base.gameObject);
                 }
             }
-            else {
+            else
+            {
                 AkSoundEngine.PostEvent(Events.Play_wCrit, base.gameObject);
             }
 
@@ -51,7 +56,8 @@ namespace RaindropLobotomy.EGO.Commando {
             base.FixedUpdate();
             base.characterBody.SetAimTimer(0.2f);
 
-            if (base.fixedAge >= duration) {
+            if (base.fixedAge >= duration)
+            {
                 outer.SetNextStateToMain();
             }
         }
@@ -61,10 +67,12 @@ namespace RaindropLobotomy.EGO.Commando {
             return InterruptPriority.PrioritySkill;
         }
 
-        public void FireBullet(string muzzle) {
+        public void FireBullet(string muzzle)
+        {
             EffectManager.SimpleMuzzleFlash(muzzle == "MuzzleLeft" ? SolemnLament.LamentMuzzleFlashBlack : SolemnLament.LamentMuzzleFlashWhite, base.gameObject, muzzle, false);
 
-            if (isAuthority) {
+            if (isAuthority)
+            {
                 BulletAttack bulletAttack = new();
                 bulletAttack.owner = base.gameObject;
                 bulletAttack.weapon = base.gameObject;

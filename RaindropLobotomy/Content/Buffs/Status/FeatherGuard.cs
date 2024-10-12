@@ -1,10 +1,11 @@
 using System;
 using RoR2.Orbs;
 
-namespace RaindropLobotomy.Buffs {
+namespace RaindropLobotomy.Buffs
+{
     public class FeatherGuard : BuffBase<FeatherGuard>
     {
-        public override BuffDef Buff => Load<BuffDef>("bdFeatherGuard.asset");
+        public override BuffDef Buff { get; set; } = Load<BuffDef>("bdFeatherGuard.asset");
         public static GameObject FeatherShieldEffect;
 
         public override void PostCreation()
@@ -17,12 +18,14 @@ namespace RaindropLobotomy.Buffs {
 
         private void FeatherGuardBlock(On.RoR2.HealthComponent.orig_TakeDamage orig, HealthComponent self, DamageInfo damageInfo)
         {
-            if (self.body.HasBuff(BuffIndex) && damageInfo.attacker && damageInfo.procCoefficient > 0) {
+            if (self.body.HasBuff(BuffIndex) && damageInfo.attacker && damageInfo.procCoefficient > 0)
+            {
                 damageInfo.rejected = true;
 
-                HurtBox[] boxes = MiscUtils.RetrieveNearbyTargets(self.body, 45f);
+                var boxes = MiscUtils.RetrieveNearbyTargets(self.body, 45f);
 
-                foreach (HurtBox box in boxes) {
+                foreach (HurtBox box in boxes)
+                {
                     LightningOrb orb = new();
                     orb.lightningType = LightningOrb.LightningType.BeadDamage;
                     orb.bouncesRemaining = 0;
@@ -34,7 +37,7 @@ namespace RaindropLobotomy.Buffs {
                     orb.AddModdedDamageType(Sin.SinReflectionType);
                     orb.isCrit = false;
                     orb.target = box;
-                    
+
                     OrbManager.instance.AddOrb(orb);
                 }
 

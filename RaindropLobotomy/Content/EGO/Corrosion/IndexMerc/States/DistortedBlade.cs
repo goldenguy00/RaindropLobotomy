@@ -1,7 +1,9 @@
 using System;
 
-namespace RaindropLobotomy.EGO.Merc {
-    public class DistortedBlade : AimThrowableBase {
+namespace RaindropLobotomy.EGO.Merc
+{
+    public class DistortedBlade : AimThrowableBase
+    {
         public bool paladinInstalled => base.characterBody.bodyIndex == IndexMerc.IndexPaladinBody;
         public override void OnEnter()
         {
@@ -15,7 +17,8 @@ namespace RaindropLobotomy.EGO.Merc {
 
             base.OnEnter();
 
-            if (paladinInstalled) {
+            if (paladinInstalled)
+            {
                 base.PlayAnimation("Gesture, Override", "ChargeSpell", "Spell.playbackRate", 0.4f);
             }
         }
@@ -37,7 +40,8 @@ namespace RaindropLobotomy.EGO.Merc {
         {
             base.UpdateTrajectoryInfo(out dest);
 
-            if (Physics.Raycast(dest.hitPoint + Vector3.up, Vector3.down, out RaycastHit info, 4000f, LayerIndex.world.mask)) {
+            if (Physics.Raycast(dest.hitPoint + Vector3.up, Vector3.down, out RaycastHit info, 4000f, LayerIndex.world.mask))
+            {
                 dest.hitPoint = info.point;
                 dest.hitNormal = info.normal;
             }
@@ -47,7 +51,8 @@ namespace RaindropLobotomy.EGO.Merc {
         {
             base.OnExit();
 
-            if (paladinInstalled) {
+            if (paladinInstalled)
+            {
                 base.PlayAnimation("Gesture, Override", "CastSpell", "Spell.playbackRate", 0.5f);
             }
         }

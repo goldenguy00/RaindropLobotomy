@@ -1,6 +1,7 @@
 using System;
 
-namespace RaindropLobotomy.EGO.Viend {
+namespace RaindropLobotomy.EGO.Viend
+{
     public class Claw : CoolerBasicMeleeAttack
     {
         public override float BaseDuration => 0.5f;

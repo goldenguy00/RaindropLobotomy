@@ -1,7 +1,9 @@
 using System;
 
-namespace RaindropLobotomy.EGO.Toolbot {
-    public class Terminate : BaseSkillState {
+namespace RaindropLobotomy.EGO.Toolbot
+{
+    public class Terminate : BaseSkillState
+    {
         public static float DamageCoeffPerSecond = 5.5f;
         public static int TickRate = 5;
         //
@@ -15,12 +17,12 @@ namespace RaindropLobotomy.EGO.Toolbot {
         public override void OnEnter()
         {
             base.OnEnter();
-            
+
             freq /= base.attackSpeedStat;
             AkSoundEngine.PostEvent(Events.Play_MULT_m1_sawblade_start, base.gameObject);
 
             PlayAnimation("Gesture, Additive Gun", "SpinBuzzsaw");
-			PlayAnimation("Gesture, Additive", "EnterBuzzsaw");
+            PlayAnimation("Gesture, Additive", "EnterBuzzsaw");
 
             attack = new();
             attack.attacker = base.gameObject;
@@ -35,13 +37,16 @@ namespace RaindropLobotomy.EGO.Toolbot {
             spinEffect.transform.localScale = Vector3.one;
         }
 
-        public void UpdateDamageType() {
+        public void UpdateDamageType()
+        {
             bool res = Util.CheckRoll(5f * base.characterBody.GetBuffCount(Grinder.Charge));
 
-            if (!res) {
+            if (!res)
+            {
                 attack.damageType &= ~DamageType.BleedOnHit;
             }
-            else {
+            else
+            {
                 attack.damageType |= DamageType.BleedOnHit;
             }
         }
@@ -53,7 +58,8 @@ namespace RaindropLobotomy.EGO.Toolbot {
             base.characterBody.SetAimTimer(2f);
             stopwatch += Time.fixedDeltaTime;
 
-            if (stopwatch >= freq && base.isAuthority) {
+            if (stopwatch >= freq && base.isAuthority)
+            {
                 attack.isCrit = base.RollCrit();
                 attack.ResetIgnoredHealthComponents();
                 UpdateDamageType();
@@ -61,12 +67,14 @@ namespace RaindropLobotomy.EGO.Toolbot {
 
                 stopwatch = 0f;
 
-                if (!inputBank.skill1.down) {
+                if (!inputBank.skill1.down)
+                {
                     outer.SetNextStateToMain();
                 }
             }
-            
-            if (hitLastAttack && base.characterMotor.velocity.y < 0f) {
+
+            if (hitLastAttack && base.characterMotor.velocity.y < 0f)
+            {
                 base.characterMotor.velocity.y += (Mathf.Abs(Physics.gravity.y) * 0.66f) * Time.fixedDeltaTime;
             }
         }
@@ -76,11 +84,12 @@ namespace RaindropLobotomy.EGO.Toolbot {
             base.OnExit();
 
             AkSoundEngine.PostEvent(Events.Play_MULT_m1_sawblade_stop, base.gameObject);
-            
-            PlayAnimation("Gesture, Additive Gun", "Empty");
-			PlayAnimation("Gesture, Additive", "ExitBuzzsaw");
 
-            if (spinEffect) {
+            PlayAnimation("Gesture, Additive Gun", "Empty");
+            PlayAnimation("Gesture, Additive", "ExitBuzzsaw");
+
+            if (spinEffect)
+            {
                 Destroy(spinEffect);
             }
         }

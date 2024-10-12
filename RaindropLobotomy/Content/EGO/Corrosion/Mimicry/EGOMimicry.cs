@@ -7,7 +7,8 @@ using UnityEngine.Networking.Types;
 using R2API.Networking;
 using System.Collections;
 
-namespace RaindropLobotomy.EGO.Viend {
+namespace RaindropLobotomy.EGO.Viend
+{
     public class EGOMimicry : CorrosionBase<EGOMimicry>
     {
         public override string EGODisplayName => "Mimicry";
@@ -40,21 +41,21 @@ namespace RaindropLobotomy.EGO.Viend {
         public static LazyIndex MimicryViendIndex = new LazyIndex("MimicryBody");
         public static SkillDef Goodbye;
 
-        public static List<Type> SkillStates = new() {
+        public static HashSet<Type> SkillStates = [
             typeof(Hello),
             typeof(Claw),
             typeof(WearShell),
             typeof(GoodbyeSlash),
             typeof(GenericCharacterMain)
-        };
+        ];
 
         public static GameObject MistEffect;
 
-        public static int[] ShellCounts = new int[6] {
+        public static int[] ShellCounts = [
             3, 5, 6, 6, 6, 3
-        };
+        ];
 
-        public static List<SkillDef> HighPriority = new() {
+        public static List<SkillDef> HighPriority = [
             Paths.SkillDef.ImpBodyBlink,
             Paths.SkillDef.BisonBodyCharge,
             Paths.SkillDef.ImpBossBodyFireVoidspikes,
@@ -80,9 +81,9 @@ namespace RaindropLobotomy.EGO.Viend {
             Load<SkillDef>("SilentAdvance.asset"),
             Load<SkillDef>("Scream.asset"),
             Load<SkillDef>("SweeperUtility.asset"),
-        };
+        ];
 
-        public static List<GameObject> DisallowedBodies = new() {
+        public static List<GameObject> DisallowedBodies = [
             Paths.GameObject.BeetleBody,
             Paths.GameObject.VoidInfestorBody,
             Paths.GameObject.GupBody,
@@ -94,11 +95,11 @@ namespace RaindropLobotomy.EGO.Viend {
             Paths.GameObject.ElectricWormBody,
             Paths.GameObject.VerminBody,
             Paths.GameObject.BeetleGuardBody
-        };
+        ];
 
         public static SkillDef Fallback => Paths.SkillDef.CommandoSlide;
 
-        public static List<BodyIndex> BlacklistedBodyIndexes;
+        public static HashSet<BodyIndex> BlacklistedBodyIndexes;
 
         public class EGOMimicryConfig : ConfigClass
         {
@@ -119,7 +120,7 @@ namespace RaindropLobotomy.EGO.Viend {
 
             BodyPrefab.GetComponent<CameraTargetParams>().cameraParams = Paths.CharacterCameraParams.ccpStandard;
 
-            RuntimeAnimatorController animController = Paths.GameObject.VoidSurvivorDisplay.GetComponentInChildren<Animator>().runtimeAnimatorController;
+            var animController = Paths.GameObject.VoidSurvivorDisplay.GetComponentInChildren<Animator>().runtimeAnimatorController;
 
             BodyPrefab.GetComponent<ModelLocator>()._modelTransform.GetComponent<Animator>().runtimeAnimatorController = Paths.RuntimeAnimatorController.animVoidSurvivor;
             BodyPrefab.GetComponent<ModelLocator>()._modelTransform.GetComponent<CharacterModel>().itemDisplayRuleSet = Paths.ItemDisplayRuleSet.idrsVoidSurvivor;
@@ -142,7 +143,7 @@ namespace RaindropLobotomy.EGO.Viend {
 
             SlashEffect = PrefabAPI.InstantiateClone(Paths.GameObject.VoidSurvivorMeleeSlash3, "MimicrySlash");
             SlashEffect.transform.Find("Rotator").Find("SwingTrail").GetComponent<ParticleSystemRenderer>().material = matMimicrySlash;
-            ParticleSystem.MainModule main = SlashEffect.transform.Find("Rotator").Find("SwingTrail").GetComponent<ParticleSystem>().main;
+            var main = SlashEffect.transform.Find("Rotator").Find("SwingTrail").GetComponent<ParticleSystem>().main;
             main.scalingMode = ParticleSystemScalingMode.Hierarchy;
             ContentAddition.AddEffect(SlashEffect);
 
@@ -152,7 +153,7 @@ namespace RaindropLobotomy.EGO.Viend {
             On.RoR2.Skills.SkillDef.IsReady += DisallowMimicWhenNoShell;
             On.RoR2.GlobalEventManager.OnCharacterDeath += WearShellOnKill;
             On.RoR2.GlobalEventManager.OnHitEnemy += Heal;
-            On.RoR2.BodyCatalog.Init += FillDisallowedIndexes;
+            RoR2.BodyCatalog.availability.CallWhenAvailable(FillDisallowedIndexes);
 
             MimicSkillDef = Load<SkillDef>("Mimic.asset");
 
@@ -163,13 +164,12 @@ namespace RaindropLobotomy.EGO.Viend {
             NetworkingAPI.RegisterMessageType<SyncShell>();
         }
 
-        private IEnumerator FillDisallowedIndexes(On.RoR2.BodyCatalog.orig_Init orig)
+        private static void FillDisallowedIndexes()
         {
-            yield return orig();
+            BlacklistedBodyIndexes = [];
 
-            BlacklistedBodyIndexes = new();
-
-            foreach (GameObject body in DisallowedBodies) {
+            foreach (var body in DisallowedBodies)
+            {
                 BlacklistedBodyIndexes.Add(body.GetComponent<CharacterBody>().bodyIndex);
             }
 
@@ -182,28 +182,30 @@ namespace RaindropLobotomy.EGO.Viend {
             BlacklistedBodyIndexes.Add(new LazyIndex("SteamMachineBody"));
         }
 
-        private void Heal(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
+        private static void Heal(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
         {
             orig(self, damageInfo, victim);
 
-            if (damageInfo.HasModdedDamageType(ClawLifestealType) && damageInfo.attacker) {
-                HealthComponent attackerHealth = damageInfo.attacker.GetComponent<HealthComponent>();
-
-                if (attackerHealth) attackerHealth.Heal(damageInfo.damage * 0.4f, new(), true);
+            if (damageInfo.HasModdedDamageType(ClawLifestealType) && damageInfo.attacker && damageInfo.attacker.TryGetComponent<HealthComponent>(out var attackerHealth))
+            {
+                attackerHealth.Heal(damageInfo.damage * 0.4f, new(), true);
             }
         }
 
-        private void WearShellOnKill(On.RoR2.GlobalEventManager.orig_OnCharacterDeath orig, GlobalEventManager self, DamageReport report)
+        private static void WearShellOnKill(On.RoR2.GlobalEventManager.orig_OnCharacterDeath orig, GlobalEventManager self, DamageReport report)
         {
-            if (report.damageInfo.HasModdedDamageType(WearShellType) && report.attackerBody && report.attackerBody.GetComponent<MimicryShellController>()) {
-                report.attackerBody.GetComponent<MimicryShellController>().UpdateShell(report.victimBody);
+            if (report.damageInfo.HasModdedDamageType(WearShellType) && report.attackerBody && report.attackerBody.TryGetComponent<MimicryShellController>(out var mimic))
+            {
+                mimic.UpdateShell(report.victimBody);
                 new SyncShell(report.attacker, report.victimBody).Send(NetworkDestination.Clients);
             }
 
             orig(self, report);
 
-            if (report.damageInfo.HasModdedDamageType(MistType)) {
-                EffectManager.SpawnEffect(MistEffect, new EffectData {
+            if (report.damageInfo.HasModdedDamageType(MistType))
+            {
+                EffectManager.SpawnEffect(MistEffect, new EffectData
+                {
                     origin = report.victimBody.corePosition,
                     scale = report.victimBody.bestFitRadius
                 }, true);
@@ -213,9 +215,11 @@ namespace RaindropLobotomy.EGO.Viend {
         }
 
         private bool DisallowMimicWhenNoShell(On.RoR2.Skills.SkillDef.orig_IsReady orig, SkillDef self, GenericSkill skillSlot)
-        {   
-            if (self == MimicSkillDef) {
-                if (!skillSlot.GetComponent<CharacterBody>().HasBuff(WornShell.Instance.Buff)) {
+        {
+            if (self == MimicSkillDef)
+            {
+                if (!skillSlot.GetComponent<CharacterBody>().HasBuff(WornShell.Instance.Buff))
+                {
                     return false;
                 }
             }
@@ -275,17 +279,20 @@ namespace RaindropLobotomy.EGO.Viend {
                 writer.Write(target.GetComponent<NetworkIdentity>().netId);
             }
 
-            public SyncShell() {
+            public SyncShell()
+            {
 
             }
 
-            public SyncShell(GameObject applyTo, CharacterBody target) {
+            public SyncShell(GameObject applyTo, CharacterBody target)
+            {
                 this.applyTo = applyTo;
                 this.target = target;
             }
         }
 
-        public class GoodbyeArmStretcher : MonoBehaviour {
+        public class GoodbyeArmStretcher : MonoBehaviour
+        {
             public bool isStretching = false;
             public int windState = 0;
             public Vector3 targetScale = new(4f, 4f, 4f);
@@ -299,259 +306,301 @@ namespace RaindropLobotomy.EGO.Viend {
             public float shrinkDur => totalDuration * shrinkDurationPerc;
             public float stretchDur => totalDuration * stretchDurationPerc;
 
-            public void BeginGoodbye(int windstate) {
+            public void BeginGoodbye(int windstate)
+            {
                 stopwatch = 0f;
                 isStretching = true;
                 windState = windstate;
                 lockedScale = Vector3.zero;
             }
 
-            public void LateUpdate() {
-                if (isStretching) {
+            public void LateUpdate()
+            {
+                if (isStretching)
+                {
                     stopwatch += Time.fixedDeltaTime;
 
-                    if (windState == 1) {
+                    if (windState == 1)
+                    {
                         base.transform.localScale = Vector3.Lerp(targetScale, originalScale, (stopwatch / totalDuration));
                     }
-                    else {
+                    else
+                    {
                         base.transform.localScale = Vector3.Lerp(originalScale, targetScale, (stopwatch / totalDuration));
                     }
 
-                    if (stopwatch >= totalDuration) {
+                    if (stopwatch >= totalDuration)
+                    {
                         base.transform.localScale = windState == 1 ? originalScale : targetScale;
                         isStretching = false;
                         lockedScale = windState == 1 ? originalScale : targetScale;
                     }
                 }
 
-                if (lockedScale != Vector3.zero) {
+                if (lockedScale != Vector3.zero)
+                {
                     base.transform.localScale = lockedScale;
                 }
             }
 
-            public void Start() {
+            public void Start()
+            {
                 originalScale = transform.localScale;
             }
         }
 
-        public class MimicryShellController : MonoBehaviour {
-            public SkillDef WornShellSD;
-            public BodyIndex TargetShell = BodyIndex.None;
-            public GenericSkill mimicSlot;
-            public List<BodyIndex> shellsWorn = new();
-            private bool assignedMimicry = false;
+        public class MimicryShellController : MonoBehaviour
+        {
             private CharacterBody us;
+            private SkillLocator loc;
+
+            public List<BodyIndex> shellsWorn = [];
+
+            private bool assignedMimicry = false;
             private float shellCooldown = 0f;
             private float lastEnemyHp = 0f;
 
-            public void Start() {
-                mimicSlot = GetComponent<SkillLocator>().utility;
+            public void Start()
+            {
+                loc = GetComponent<SkillLocator>();
                 us = GetComponent<CharacterBody>();
             }
 
-            public void FixedUpdate() {
-                if (shellCooldown >= 0f) {
+            public void FixedUpdate()
+            {
+                if (shellCooldown >= 0f)
+                {
                     shellCooldown -= Time.fixedDeltaTime;
                 }
 
-                if (shellCooldown <= 0f) {
+                if (shellCooldown <= 0f)
+                {
                     lastEnemyHp = 0f;
                 }
             }
 
-            public void UpdateShell(CharacterBody body) {
+            public void UpdateShell(CharacterBody body)
+            {
                 // Debug.Log("Wearing a shell!");
 
-                bool useFallbackSkill = false;
+                var useFallbackSkill = false;
 
-                foreach (BodyIndex index in BlacklistedBodyIndexes) {
+                foreach (var index in BlacklistedBodyIndexes)
+                {
                     if (body.bodyIndex == index) useFallbackSkill = true;
                 }
 
-                bool onlyAllowHigherShell = shellCooldown >= 0f;
+                var onlyAllowHigherShell = shellCooldown >= 0f;
 
-                if (onlyAllowHigherShell) {
-                    if (body.maxHealth >= lastEnemyHp) {
+                if (onlyAllowHigherShell)
+                {
+                    if (body.maxHealth >= lastEnemyHp)
+                    {
                         lastEnemyHp = body.maxHealth;
                     }
-                    else {
+                    else
+                    {
                         return;
                     }
                 }
-                
-                if (shellCooldown <= 0f) {
+
+                if (shellCooldown <= 0f)
+                {
                     shellCooldown = 2f;
                 }
 
-                if (!shellsWorn.Contains(body.bodyIndex)) {
+                if (!shellsWorn.Contains(body.bodyIndex))
+                {
                     shellsWorn.Add(body.bodyIndex);
-                    
-                    if (NetworkServer.active) GetComponent<CharacterBody>().AddBuff(Buffs.Imitation.Instance.Buff);
 
-                    int index = 0;
+                    if (NetworkServer.active)
+                        us.AddBuff(Buffs.Imitation.Instance.Buff);
 
-                    if (SceneCatalog.mostRecentSceneDef == Paths.SceneDef.moon || SceneCatalog.mostRecentSceneDef == Paths.SceneDef.moon2) {
+                    var index = 0;
+
+                    if (SceneCatalog.mostRecentSceneDef == Paths.SceneDef.moon || SceneCatalog.mostRecentSceneDef == Paths.SceneDef.moon2)
+                    {
                         index = 5;
                     }
-                    else {
-                        index = Run.instance.stageClearCount + 1 % 5;
+                    else
+                    {
+                        index = (Run.instance.stageClearCount + 1) % 5;
                         if (index == 0) index = 5;
                         index--;
                     }
 
                     // Debug.Log($"target shell count is {ShellCounts[index]} at index {index}");
 
-                    if (shellsWorn.Count >= ShellCounts[index] && !assignedMimicry) {
-                        if (us.hasAuthority) GetComponent<SkillLocator>().special.SetSkillOverride(base.gameObject, Goodbye, GenericSkill.SkillOverridePriority.Upgrade);
+                    if (shellsWorn.Count >= ShellCounts[index] && !assignedMimicry)
+                    {
+                        if (us.hasAuthority)
+                            loc.special.SetSkillOverride(base.gameObject, Goodbye, GenericSkill.SkillOverridePriority.Upgrade);
                         assignedMimicry = true;
                     }
                 }
 
-                SkillDef copySkill = EGOMimicry.Fallback;
+                var copySkill = EGOMimicry.Fallback;
 
-                if (!useFallbackSkill) {
-                    List<GenericSkill> skills = body.GetComponents<GenericSkill>().ToList();
-                    skills = skills.OrderBy(x => x.skillDef.baseRechargeInterval).ToList();
+                if (!useFallbackSkill)
+                {
+                    var skills = body.GetComponents<GenericSkill>().OrderBy(x => x.skillDef.baseRechargeInterval);
+                    var skill = skills.FirstOrDefault(x => HighPriority.Contains(x.skillDef));
 
-                    GenericSkill skill = skills.FirstOrDefault(x => HighPriority.Contains(x.skillDef));
-
-                    if (!skill) {
+                    if (!skill)
+                    {
                         skill = skills.FirstOrDefault(x => x.skillDef.activationStateMachineName != "Body");
-                        if (!skill) skill = skills.First();
+
+                        if (!skill)
+                            skill = skills.First();
                     }
 
                     copySkill = skill.skillDef;
                 }
 
-                TargetShell = body.bodyIndex;
+                var def = loc.utility ? loc.utility.skillDef : null;
 
-                if (mimicSlot && mimicSlot.skillDef == MimicSkillDef) {
-                    mimicSlot.skillDef.activationStateMachineName = "Mimic";
-                    mimicSlot.skillDef.activationState = copySkill.activationState;
-                    mimicSlot.skillDef.beginSkillCooldownOnSkillEnd = true;
-                    mimicSlot.skillDef.baseMaxStock = copySkill.baseMaxStock;
-                    mimicSlot.skillDef.stockToConsume = copySkill.stockToConsume;
-                    mimicSlot.skillDef.rechargeStock = copySkill.rechargeStock;
-                    mimicSlot.skillDef.interruptPriority = InterruptPriority.Any;
-                    mimicSlot.skillDef.fullRestockOnAssign = true;
-                    mimicSlot.skillDef.isCombatSkill = copySkill.isCombatSkill;
-                    mimicSlot.skillDef.resetCooldownTimerOnUse = copySkill.resetCooldownTimerOnUse;
-                    mimicSlot.skillDef.mustKeyPress = copySkill.mustKeyPress;
-                    mimicSlot.skillDef.cancelSprintingOnActivation = copySkill.cancelSprintingOnActivation;
+                if (def && def == MimicSkillDef)
+                {
+                    def.activationStateMachineName = "Mimic";
+                    def.activationState = copySkill.activationState;
+                    def.beginSkillCooldownOnSkillEnd = true;
+                    def.baseMaxStock = copySkill.baseMaxStock;
+                    def.stockToConsume = copySkill.stockToConsume;
+                    def.rechargeStock = copySkill.rechargeStock;
+                    def.interruptPriority = InterruptPriority.Any;
+                    def.fullRestockOnAssign = true;
+                    def.isCombatSkill = copySkill.isCombatSkill;
+                    def.resetCooldownTimerOnUse = copySkill.resetCooldownTimerOnUse;
+                    def.mustKeyPress = copySkill.mustKeyPress;
+                    def.cancelSprintingOnActivation = copySkill.cancelSprintingOnActivation;
 
-                    float targetCD = copySkill.baseRechargeInterval;
-                    targetCD *= 0.65f;
+                    var targetCD = copySkill.baseRechargeInterval * 0.65f;
 
                     // Debug.Log("target's modified cd: " + targetCD);
-                    
-                    float newCD = Mathf.Min(targetCD, 5f);
+
+                    var newCD = Mathf.Min(targetCD, 5f);
                     // Debug.Log("clamped cd: " + newCD);
 
-                    mimicSlot.skillDef.baseRechargeInterval = newCD;
-                    mimicSlot.RecalculateFinalRechargeInterval();
+                    def.baseRechargeInterval = newCD;
+                    loc.utility.RecalculateFinalRechargeInterval();
                 }
 
-                CharacterBody body2 = GetComponent<CharacterBody>();
-                if (NetworkServer.active) body2.SetBuffCount(Buffs.WornShell.Instance.Buff.buffIndex, 1);
+                if (NetworkServer.active)
+                    us.SetBuffCount(Buffs.WornShell.Instance.Buff.buffIndex, 1);
+
                 Buffs.WornShell.Instance.Buff.buffColor = body.bodyColor;
             }
         }
-        
-        public void TransformHooks() {
-            On.ChildLocator.FindChild_string += (orig, self, str) => {
-                Transform transform = orig(self, str);
-                if (transform) {
-                    return transform;
-                }
 
-                if (str == "HealthBarOrigin") {
-                    return orig(self, str);
-                }
-
-                Transform handBeam = orig(self, "MuzzleHandBeam");
-
-                if (handBeam) return handBeam;
-                return orig(self, str);
-            };
-
-            On.ChildLocator.FindChildIndex_string += (orig, self, str) => {
-                int c = orig(self, str);
-                if (c != -1) {
-                    return c;
-                }
-
-                int handBeam = orig(self, "MuzzleHandBeam");
-
-                if (handBeam != -1) return handBeam;
-                return orig(self, str);
-            };
-
-            On.EntityStates.EntityState.PlayAnimation_string_string += (orig, self, str, str2) => {
-                if (self.characterBody && self.characterBody.bodyIndex == MimicryViendIndex) {
-                    Animator anim = self.GetModelAnimator();
-                    bool state = anim.HasState(anim.GetLayerIndex(str), Animator.StringToHash(str2));
-
-                    // Debug.Log("has state: " + state);
-
-                    if (!state) {
-                        orig(self, "LeftArm, Override", "FireHandBeam");
-                        return;
-                    }
-                }
-
-                orig(self, str, str2);
-            };
-
-            On.EntityStates.EntityState.PlayAnimation_string_string_string_float_float += (orig, self, str, str2, str3, f, f2) => {
-                if (self.characterBody && self.characterBody.bodyIndex == MimicryViendIndex) {
-                    Animator anim = self.GetModelAnimator();
-                    bool state = anim.HasState(anim.GetLayerIndex(str), Animator.StringToHash(str2));
-
-                    // Debug.Log("has state: " + state);
-
-                    if (!state) {
-                        orig(self, "LeftArm, Override", "FireHandBeam", "HandBeam.playbackRate", f, f2);
-                        return;
-                    }
-                }
-
-                orig(self, str, str2, str3, f, f2);
-            };
-
-            On.EntityStates.BaseState.OnEnter += (orig, self) => {
-                orig(self);
-
-                if (self.characterBody && self.characterBody.bodyIndex == MimicryViendIndex) {
-                    if (IsAStolenSkill(self)) {
-                        self.damageStat *= 1.75f;
-                        self.attackSpeedStat *= 1.75f;
-                    }
-                }
-            };
-
-            On.RoR2.EntityStateMachine.ManagedFixedUpdate += (orig, self, delta) => {
-                bool wasS1Down = false;
-                bool stolen = self.state != null && IsAStolenSkill(self.state);
-                bool didWeEvenRun = false;
-
-                if (self.state != null && self.state.characterBody && self.state.characterBody.bodyIndex == MimicryViendIndex && stolen) {
-                    wasS1Down = self.state.inputBank.skill1.down;
-                    self.state.inputBank.skill1.down = self.state.inputBank.skill3.down;
-
-                    didWeEvenRun = true;
-                }
-
-                orig(self, delta);
-
-                if (didWeEvenRun) {
-                    self.state.inputBank.skill1.down = wasS1Down;
-                }
-            };
+        public void TransformHooks()
+        {
+            On.ChildLocator.FindChild_string += ChildLocator_FindChild_string;
+            On.ChildLocator.FindChildIndex_string += ChildLocator_FindChildIndex_string;
+            On.EntityStates.EntityState.PlayAnimation_string_string += EntityState_PlayAnimation_string_string;
+            On.EntityStates.EntityState.PlayAnimation_string_string_string_float_float += EntityState_PlayAnimation_string_string_string_float_float;
+            On.EntityStates.BaseState.OnEnter += BaseState_OnEnter;
+            On.RoR2.EntityStateMachine.ManagedFixedUpdate += EntityStateMachine_ManagedFixedUpdate;
         }
 
-        public bool IsAStolenSkill(EntityState state) {
-            foreach (Type stateType in SkillStates) {
-                if (state.GetType() == stateType) {
+        // this is fucking disgusting
+        private static void EntityStateMachine_ManagedFixedUpdate(On.RoR2.EntityStateMachine.orig_ManagedFixedUpdate orig, EntityStateMachine self, float delta)
+        {
+            if (!self.state?.characterBody || self.state.characterBody.bodyIndex != MimicryViendIndex)
+            {
+                orig(self, delta);
+                return;
+            }
+
+            var wasS1Down = false;
+            var didWeEvenRun = false;
+
+            if (IsAStolenSkill(self.state))
+            {
+                wasS1Down = self.state.inputBank.skill1.down;
+                self.state.inputBank.skill1.down = self.state.inputBank.skill3.down;
+
+                didWeEvenRun = true;
+            }
+
+            orig(self, delta);
+
+            if (didWeEvenRun)
+            {
+                self.state.inputBank.skill1.down = wasS1Down;
+            }
+        }
+
+        private static void BaseState_OnEnter(On.EntityStates.BaseState.orig_OnEnter orig, BaseState self)
+        {
+            orig(self);
+
+            if (self.characterBody && self.characterBody.bodyIndex == MimicryViendIndex)
+            {
+                if (IsAStolenSkill(self))
+                {
+                    self.damageStat *= 1.75f;
+                    self.attackSpeedStat *= 1.75f;
+                }
+            }
+        }
+
+        private static void EntityState_PlayAnimation_string_string_string_float_float(On.EntityStates.EntityState.orig_PlayAnimation_string_string_string_float_float orig, EntityState self, string str, string str2, string str3, float f, float f2)
+        {
+            if (self.characterBody && self.characterBody.bodyIndex == MimicryViendIndex)
+            {
+                var anim = self.GetModelAnimator();
+                var state = anim.HasState(anim.GetLayerIndex(str), Animator.StringToHash(str2));
+
+                // Debug.Log("has state: " + state);
+
+                if (!state)
+                {
+                    str = "LeftArm, Override";
+                    str2 = "FireHandBeam";
+                    str3 = "HandBeam.playbackRate";
+                }
+            }
+
+            orig(self, str, str2, str3, f, f2);
+        }
+
+        private static void EntityState_PlayAnimation_string_string(On.EntityStates.EntityState.orig_PlayAnimation_string_string orig, EntityState self, string str, string str2)
+        {
+            if (self.characterBody && self.characterBody.bodyIndex == MimicryViendIndex)
+            {
+                var anim = self.GetModelAnimator();
+                var state = anim.HasState(anim.GetLayerIndex(str), Animator.StringToHash(str2));
+
+                // Debug.Log("has state: " + state);
+
+                if (!state)
+                {
+                    str = "LeftArm, Override";
+                    str2 = "FireHandBeam";
+                }
+            }
+
+            orig(self, str, str2);
+        }
+
+        private static int ChildLocator_FindChildIndex_string(On.ChildLocator.orig_FindChildIndex_string orig, ChildLocator self, string str)
+        {
+            var c = orig(self, str);
+            return (c != -1) ? c : orig(self, "MuzzleHandBeam");
+        }
+
+        private static Transform ChildLocator_FindChild_string(On.ChildLocator.orig_FindChild_string orig, ChildLocator self, string str)
+        {
+            var transform = orig(self, str);
+            return (transform || str == "HealthBarOrigin") ? transform : orig(self, "MuzzleHandBeam");
+        }
+
+        public static bool IsAStolenSkill(EntityState state)
+        {
+            foreach (var stateType in SkillStates)
+            {
+                if (state.GetType() == stateType)
+                {
                     return false;
                 }
             }

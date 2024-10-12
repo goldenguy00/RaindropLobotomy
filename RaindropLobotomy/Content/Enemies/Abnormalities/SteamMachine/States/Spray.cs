@@ -1,7 +1,9 @@
 using System;
 
-namespace RaindropLobotomy.Enemies.SteamMachine {
-    public class Spray : BaseState {
+namespace RaindropLobotomy.Enemies.SteamMachine
+{
+    public class Spray : BaseState
+    {
         private GameObject sprayInstance;
         private Transform muzzle;
         private Timer sprayTimer = new(0.2f, false, true, false, true);
@@ -21,34 +23,37 @@ namespace RaindropLobotomy.Enemies.SteamMachine {
 
             base.characterBody.SetAimTimer(1f);
 
-            if (!started && animator.GetFloat("sprayBegun") >= 0.5f) {
+            if (!started && animator.GetFloat("sprayBegun") >= 0.5f)
+            {
                 FindModelChild("Spray").GetComponent<ParticleSystem>().Play();
                 started = true;
             }
 
-            if (animator.GetFloat("sprayBegun") <= 0.2f && started) {
+            if (animator.GetFloat("sprayBegun") <= 0.2f && started)
+            {
                 outer.SetNextStateToMain();
                 return;
             }
 
 
-            if (sprayTimer.Tick() && started && base.isAuthority) {
-                BulletAttack attack = new();
-                attack.damage = base.damageStat * 4f * sprayTimer.duration;
-                attack.aimVector = -muzzle.transform.forward;
-                attack.weapon = muzzle.gameObject;
-                attack.owner = base.gameObject;
-                attack.falloffModel = BulletAttack.FalloffModel.None;
-                attack.isCrit = base.RollCrit();
-                attack.stopperMask = LayerIndex.world.mask;
-                attack.origin = muzzle.transform.position;
-                attack.procCoefficient = 1f;
-                attack.radius = 1f;
-                attack.smartCollision = true;
-                attack.maxDistance = 35f;
-                attack.muzzleName = "Nozzle";
-                
-                attack.Fire();
+            if (sprayTimer.Tick() && started && base.isAuthority)
+            {
+                new BulletAttack()
+                {
+                    damage = base.damageStat * 4f * sprayTimer.duration,
+                    aimVector = -muzzle.transform.forward,
+                    weapon = muzzle.gameObject,
+                    owner = base.gameObject,
+                    falloffModel = BulletAttack.FalloffModel.None,
+                    isCrit = base.RollCrit(),
+                    stopperMask = LayerIndex.world.mask,
+                    origin = muzzle.transform.position,
+                    procCoefficient = 1f,
+                    radius = 1f,
+                    smartCollision = true,
+                    maxDistance = 35f,
+                    muzzleName = "Nozzle"
+                }.Fire();
             }
         }
 

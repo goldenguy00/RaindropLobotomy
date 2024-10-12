@@ -1,6 +1,7 @@
 using System;
 
-namespace RaindropLobotomy.EGO.Bandit {
+namespace RaindropLobotomy.EGO.Bandit
+{
     public class EGOMagicBullet : CorrosionBase<EGOMagicBullet>
     {
         public override string EGODisplayName => "Magic Bullet";
@@ -133,7 +134,8 @@ namespace RaindropLobotomy.EGO.Bandit {
 
         private void DespairMultiplier(On.RoR2.HealthComponent.orig_TakeDamageProcess orig, HealthComponent self, DamageInfo damageInfo)
         {
-            if (self.body.teamComponent.teamIndex != TeamIndex.Player && damageInfo.HasModdedDamageType(DespairDamage)) {
+            if (self.body.teamComponent.teamIndex != TeamIndex.Player && damageInfo.HasModdedDamageType(DespairDamage))
+            {
                 damageInfo.damage *= 10f;
                 damageInfo.damageType &= ~DamageType.NonLethal;
             }
@@ -141,13 +143,16 @@ namespace RaindropLobotomy.EGO.Bandit {
             orig(self, damageInfo);
         }
 
-        public static bool GiveAmmo(CharacterBody body) {
+        public static bool GiveAmmo(CharacterBody body)
+        {
             SkillLocator loc = body.skillLocator;
 
             if (NetworkServer.active) body.AddBuff(MB);
 
-            if (body.GetBuffCount(MB) >= 7) {
-                if (body.hasAuthority) {
+            if (body.GetBuffCount(MB) >= 7)
+            {
+                if (body.hasAuthority)
+                {
                     loc.primary.SetSkillOverride(body, Despair, GenericSkill.SkillOverridePriority.Contextual);
                     loc.special.SetSkillOverride(body, Despair, GenericSkill.SkillOverridePriority.Contextual);
                 }
@@ -158,12 +163,14 @@ namespace RaindropLobotomy.EGO.Bandit {
             return false;
         }
 
-        public static void SpendAmmo(CharacterBody body) {
+        public static void SpendAmmo(CharacterBody body)
+        {
             SkillLocator loc = body.skillLocator;
 
             if (NetworkServer.active) body.SetBuffCount(MB.buffIndex, 0);
 
-            if (body.hasAuthority) {
+            if (body.hasAuthority)
+            {
                 loc.primary.UnsetSkillOverride(body, Despair, GenericSkill.SkillOverridePriority.Contextual);
                 loc.special.UnsetSkillOverride(body, Despair, GenericSkill.SkillOverridePriority.Contextual);
             }
@@ -195,7 +202,8 @@ namespace RaindropLobotomy.EGO.Bandit {
         }
     }
 
-    public class MagicBulletTargeter : HurtboxTracker {
+    public class MagicBulletTargeter : HurtboxTracker
+    {
         public bool shouldTrack = true;
         public override void Start()
         {
@@ -203,7 +211,8 @@ namespace RaindropLobotomy.EGO.Bandit {
             maxSearchAngle = 25f;
             maxSearchDistance = 60f;
             targetType = TargetType.Enemy;
-            isActiveCallback = () => {
+            isActiveCallback = () =>
+            {
                 return shouldTrack;
             };
 
@@ -211,22 +220,27 @@ namespace RaindropLobotomy.EGO.Bandit {
         }
     }
 
-    public class MagicBulletPortal : MonoBehaviour {
+    public class MagicBulletPortal : MonoBehaviour
+    {
         public bool isOutput = false;
-        public List<MagicBulletPortal> outputPortals = new();
+        public List<MagicBulletPortal> outputPortals = [];
 
         public Transform aimTarget;
 
-        public void Update() {
-            if (aimTarget) {
+        public void Update()
+        {
+            if (aimTarget)
+            {
                 base.transform.forward = (aimTarget.transform.position - base.transform.position).normalized;
             }
         }
 
-        public void FireBullet(BulletAttack attack) {
+        public void FireBullet(BulletAttack attack)
+        {
             EffectManager.SimpleEffect(Paths.GameObject.OmniImpactVFXHuntress, this.transform.position, Quaternion.identity, true);
 
-            foreach (MagicBulletPortal portal in outputPortals) {
+            foreach (MagicBulletPortal portal in outputPortals)
+            {
                 attack.aimVector = portal.transform.forward;
                 attack.weapon = portal.gameObject;
                 attack.origin = portal.transform.position;

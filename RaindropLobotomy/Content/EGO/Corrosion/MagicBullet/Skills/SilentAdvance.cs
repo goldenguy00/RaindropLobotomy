@@ -1,8 +1,10 @@
 using System;
 using RaindropLobotomy.Buffs;
 
-namespace RaindropLobotomy.EGO.Bandit {
-    public class SilentAdvance : AimThrowableBase {
+namespace RaindropLobotomy.EGO.Bandit
+{
+    public class SilentAdvance : AimThrowableBase
+    {
         public override void OnEnter()
         {
             base.maxDistance = 40f;
@@ -17,7 +19,8 @@ namespace RaindropLobotomy.EGO.Bandit {
 
         public override void FireProjectile()
         {
-            if (!isAuthority) {
+            if (!isAuthority)
+            {
                 return;
             }
 

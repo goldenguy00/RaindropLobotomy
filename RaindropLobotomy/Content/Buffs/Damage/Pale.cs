@@ -4,10 +4,11 @@ using MonoMod.Cil;
 using RaindropLobotomy.EGO.Viend;
 using RoR2.UI;
 
-namespace RaindropLobotomy.Buffs {
+namespace RaindropLobotomy.Buffs
+{
     public class Pale : BuffBase
     {
-        public override BuffDef Buff => Load<BuffDef>("bdPale.asset");
+        public override BuffDef Buff { get; set; } = Load<BuffDef>("bdPale.asset");
         public static DamageAPI.ModdedDamageType PaleDamage = DamageAPI.ReserveDamageType();
         private static float PaleMaxDuration = 10f;
         private static float PaleMinDuration = 3f;
@@ -47,16 +48,20 @@ namespace RaindropLobotomy.Buffs {
                 x => x.MatchStfld(typeof(HealthBar.BarInfo), "enabled")
             );
 
-            if (found) {
+            if (found)
+            {
                 c.Emit(OpCodes.Ldarg_0);
-                c.EmitDelegate<Action<HealthBar>>((bar) => {
+                c.EmitDelegate<Action<HealthBar>>((bar) =>
+                {
                     ref HealthBar.BarInfo curseBar = ref bar.barInfoCollection.curseBarInfo;
-                    if (bar.source && bar.source.body && bar.source.body.GetBuffCount(Buff) > 0) {
+                    if (bar.source && bar.source.body && bar.source.body.GetBuffCount(Buff) > 0)
+                    {
                         curseBar.color = PaleColor;
                     }
                 });
             }
-            else {
+            else
+            {
                 // Debug.LogError("Failed to apply Pale Damage Color IL Hook");
             }
         }
@@ -84,7 +89,7 @@ namespace RaindropLobotomy.Buffs {
             */
             ILCursor c = new(il);
 
-            bool found = c.TryGotoNext(MoveType.Before, 
+            bool found = c.TryGotoNext(MoveType.Before,
                 x => x.MatchLdloc(93),
                 x => x.MatchLdcI4(0),
                 x => x.MatchBle(out _),
@@ -99,9 +104,11 @@ namespace RaindropLobotomy.Buffs {
                 x => x.MatchAdd()
             );
 
-            if (found) {
+            if (found)
+            {
                 c.Emit(OpCodes.Ldarg_0);
-                c.EmitDelegate<Action<CharacterBody>>((x) => {
+                c.EmitDelegate<Action<CharacterBody>>((x) =>
+                {
                     int paleCount = x.GetBuffCount(Buff);
                     // // Debug.Log("pale count is: " + paleCount);
                     if (paleCount <= 0) return;
@@ -113,30 +120,34 @@ namespace RaindropLobotomy.Buffs {
                     // // Debug.Log("curse penalty: " + x.cursePenalty);
                 });
             }
-            else {
+            else
+            {
                 // Debug.LogError("Failed to apply Pale Damage IL Hook");
             }
         }
 
         private void ReceivedPaleDamage(On.RoR2.HealthComponent.orig_TakeDamageProcess orig, HealthComponent self, DamageInfo damageInfo)
         {
-            if (damageInfo.HasModdedDamageType(PaleDamage)) {                
+            if (damageInfo.HasModdedDamageType(PaleDamage))
+            {
                 float targetMaxHP = self.fullHealth;
                 float totalPale = damageInfo.damage;
                 float mult = totalPale * 0.01f;
                 float damage = targetMaxHP * mult;
 
-                if (self.body.bodyIndex == MimicryViendIndex) {
+                if (self.body.bodyIndex == MimicryViendIndex)
+                {
                     damage *= 0.8f;
                 }
 
                 int paleToInflict = Mathf.FloorToInt(totalPale / 2);
                 float paleDuration = Util.Remap(totalPale, 0, 100, PaleMinDuration, PaleMaxDuration);
 
-                for (int i = 0; i < paleToInflict; i++) {
+                for (int i = 0; i < paleToInflict; i++)
+                {
                     self.body.AddTimedBuff(Buff, paleDuration);
                 }
-                
+
                 damageInfo.damage = damage;
                 damageInfo.RemoveModdedDamageType(PaleDamage);
             }
@@ -146,8 +157,7 @@ namespace RaindropLobotomy.Buffs {
 
         private Color GetPaleColor(On.RoR2.DamageColor.orig_FindColor orig, DamageColorIndex colorIndex)
         {
-            if (colorIndex == PaleColorIndex) return PaleColor;
-            return orig(colorIndex);
+            return colorIndex == PaleColorIndex ? (Color)PaleColor : orig(colorIndex);
         }
     }
 }

@@ -1,9 +1,10 @@
 using System;
 
-namespace RaindropLobotomy.Buffs {
+namespace RaindropLobotomy.Buffs
+{
     public class Poise : BuffBase<Poise>
     {
-        public override BuffDef Buff => Load<BuffDef>("bdPoise");
+        public override BuffDef Buff { get; set; } = Load<BuffDef>("bdPoise");
         public DamageAPI.ModdedDamageType GivePoise = DamageAPI.ReserveDamageType();
 
         public override void PostCreation()
@@ -16,17 +17,19 @@ namespace RaindropLobotomy.Buffs {
         {
             orig(self, damageInfo, victim);
 
-            if (damageInfo.crit && damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>()) {
-                int count = damageInfo.attacker.GetComponent<CharacterBody>().GetBuffCount(Buff);
-                
-                if (count > 0) {
-                    damageInfo.attacker.GetComponent<CharacterBody>().SetBuffCount(Buff.buffIndex, Mathf.Clamp(count - 1, 0, 20));
+            if (damageInfo.attacker && damageInfo.attacker.TryGetComponent<CharacterBody>(out var body))
+            {
+                int count = body.GetBuffCount(Buff);
+                if (damageInfo.crit && count > 0)
+                {
+                    body.SetBuffCount(Buff.buffIndex, Mathf.Clamp(count - 1, 0, 20));
                 }
-            }
 
-            if (damageInfo.attacker && damageInfo.HasModdedDamageType(GivePoise) && damageInfo.attacker.GetComponent<CharacterBody>()) {
-                int count = damageInfo.attacker.GetComponent<CharacterBody>().GetBuffCount(Buff);
-                damageInfo.attacker.GetComponent<CharacterBody>().SetBuffCount(Buff.buffIndex, Mathf.Clamp(count + 1, 0, 20));
+                if (damageInfo.HasModdedDamageType(GivePoise))
+                {
+                    count = body.GetBuffCount(Buff);
+                    body.SetBuffCount(Buff.buffIndex, Mathf.Clamp(count + 1, 0, 20));
+                }
             }
         }
 
@@ -34,7 +37,8 @@ namespace RaindropLobotomy.Buffs {
         {
             int PoiseCount = sender.GetBuffCount(Buff);
 
-            if (PoiseCount > 0) {
+            if (PoiseCount > 0)
+            {
                 args.critAdd += PoiseCount * 5;
             }
         }

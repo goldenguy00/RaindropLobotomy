@@ -1,6 +1,7 @@
 using System;
 
-namespace RaindropLobotomy.EGO.Merc {
+namespace RaindropLobotomy.EGO.Merc
+{
     public class SwordDraw : CoolerBasicMeleeAttack, SteppedSkillDef.IStepSetter
     {
         public override float BaseDuration => 0.6f;
@@ -44,7 +45,8 @@ namespace RaindropLobotomy.EGO.Merc {
         {
             base.AuthorityModifyOverlapAttack(overlapAttack);
 
-            if (overlapAttack.isCrit) {
+            if (overlapAttack.isCrit)
+            {
                 overlapAttack.damageType |= DamageType.BleedOnHit;
             }
         }

@@ -4,12 +4,14 @@ using System.Linq;
 using EntityStates.ArtifactShell;
 using EntityStates.Interactables.MSObelisk;
 
-namespace RaindropLobotomy.EGO.Commando {
-    public class EternalRest : BaseSkillState {
+namespace RaindropLobotomy.EGO.Commando
+{
+    public class EternalRest : BaseSkillState
+    {
         public float totalDuration = 3f;
         public int totalShots = 16;
         public float damageCoeff = 2f;
-        public List<HurtBox> hurtBoxes = new();
+        public List<HurtBox> hurtBoxes = [];
         private GameObject ImpactWhite => Load<GameObject>("LamentImpactWhite.prefab");
         private GameObject ImpactBlack => Load<GameObject>("LamentImpactBlack.prefab");
         private bool firedAtLeastOnce = false;
@@ -36,7 +38,8 @@ namespace RaindropLobotomy.EGO.Commando {
 
             shotDelay = totalDuration / totalShots;
 
-            if (!UpdateHurtboxes()) {
+            if (!UpdateHurtboxes())
+            {
                 outer.SetNextStateToMain();
             }
 
@@ -45,35 +48,44 @@ namespace RaindropLobotomy.EGO.Commando {
             rotateObject = base.transform.Find("RotateObject");
         }
 
-        public IEnumerator FireBullets() {
-            for (int i = 0; i < 8; i++) {
-                for (int j = 1; j <= 2; j++) {
+        public IEnumerator FireBullets()
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 1; j <= 2; j++)
+                {
                     yield return new WaitForSeconds(shotDelay);
 
-                    if (!SolemnLament.config.ReplaceSoundEffects) {
-                        if (j % 2 == 0) {
+                    if (!SolemnLament.config.ReplaceSoundEffects)
+                    {
+                        if (j % 2 == 0)
+                        {
                             AkSoundEngine.PostEvent("Play_butterflyShot_black", base.gameObject);
                         }
-                        else {
+                        else
+                        {
                             AkSoundEngine.PostEvent("Play_butterflyShot_white", base.gameObject);
                         }
                     }
-                    else {
+                    else
+                    {
                         AkSoundEngine.PostEvent(Events.Play_wCrit, base.gameObject);
                     }
 
 
-                    if (!UpdateHurtboxes()) {
+                    if (!UpdateHurtboxes())
+                    {
                         goto end;
                     }
 
-                    foreach (HurtBox box in hurtBoxes) {
+                    foreach (HurtBox box in hurtBoxes)
+                    {
                         FireBullet(j, box);
                     }
                 }
             }
 
-            end:
+        end:
             outer.SetNextStateToMain();
         }
 
@@ -81,12 +93,14 @@ namespace RaindropLobotomy.EGO.Commando {
         {
             base.OnExit();
 
-            if (firedAtLeastOnce) {
+            if (firedAtLeastOnce)
+            {
                 base.skillLocator.special.DeductStock(1);
             }
         }
 
-        public void FireBullet(int pistol, HurtBox target) {
+        public void FireBullet(int pistol, HurtBox target)
+        {
             if (pistol % 2 == 0)
             {
                 PlayAnimation("Gesture Additive, Left", "FirePistol, Left");
@@ -99,10 +113,12 @@ namespace RaindropLobotomy.EGO.Commando {
             }
         }
 
-        public void FireBullet(string muzzle, Vector3 target) {
+        public void FireBullet(string muzzle, Vector3 target)
+        {
             EffectManager.SimpleMuzzleFlash(muzzle == "MuzzleLeft" ? SolemnLament.LamentMuzzleFlashBlack : SolemnLament.LamentMuzzleFlashWhite, base.gameObject, muzzle, false);
 
-            if (isAuthority) {
+            if (isAuthority)
+            {
                 BulletAttack bulletAttack = new();
                 bulletAttack.owner = base.gameObject;
                 bulletAttack.weapon = base.gameObject;
@@ -137,7 +153,8 @@ namespace RaindropLobotomy.EGO.Commando {
             base.characterDirection.forward = rotateObject.forward;
         }
 
-        public bool UpdateHurtboxes() {
+        public bool UpdateHurtboxes()
+        {
             hurtBoxes.RemoveAll(x => x == null);
 
             return hurtBoxes.Count > 0;

@@ -3,10 +3,11 @@ using System.Linq;
 using Newtonsoft.Json.Utilities;
 using RaindropLobotomy.EGO.Commando;
 
-namespace RaindropLobotomy.Buffs {
+namespace RaindropLobotomy.Buffs
+{
     public class Sealed : BuffBase<Sealed>
     {
-        public override BuffDef Buff => Load<BuffDef>("bdLamentSeal.asset");
+        public override BuffDef Buff { get; set; } = Load<BuffDef>("bdLamentSeal.asset");
 
         public override void PostCreation()
         {
@@ -19,8 +20,9 @@ namespace RaindropLobotomy.Buffs {
         {
             orig(self, damageInfo, victim);
 
-            if (damageInfo.HasModdedDamageType(SolemnLament.Seal) && victim && victim.GetComponent<CharacterBody>().GetBuffCount(Buff) < 4) {
-                victim.GetComponent<CharacterBody>().AddTimedBuff(Buff, victim.GetComponent<CharacterBody>().isChampion ? 7.5f : 15f, 4);
+            if (damageInfo.HasModdedDamageType(SolemnLament.Seal) && victim && victim.TryGetComponent<CharacterBody>(out var body) && body.GetBuffCount(Buff) < 4)
+            {
+                body.AddTimedBuff(Buff, body.isChampion ? 7.5f : 15f, 4);
             }
         }
 
@@ -28,10 +30,12 @@ namespace RaindropLobotomy.Buffs {
         {
             int count = sender.GetBuffCount(Buff);
 
-            if (count >= 4) {
+            if (count >= 4)
+            {
                 SetStateOnHurt hurt = sender.GetComponent<SetStateOnHurt>();
 
-                if (hurt && hurt.canBeStunned) {
+                if (hurt && hurt.canBeStunned)
+                {
                     hurt.SetStun(10f);
                 }
             }
@@ -41,12 +45,14 @@ namespace RaindropLobotomy.Buffs {
         {
             int buffCount = self.characterBody.GetBuffCount(Buff.buffIndex);
 
-            if (buffCount > 0) {
+            if (buffCount > 0)
+            {
                 SkillLocator locator = self.characterBody.skillLocator;
 
                 if (Sealable(buffCount, self, new GenericSkill[] {
                     locator.primary, locator.secondary, locator.utility, locator.special
-                })) {
+                }))
+                {
                     return false;
                 }
             }
@@ -54,10 +60,13 @@ namespace RaindropLobotomy.Buffs {
             return orig(self);
         }
 
-        private bool Sealable(int count, GenericSkill skill, GenericSkill[] slots) {
-            slots = slots.Where(x => x != null).ToArray();
+        private bool Sealable(int count, GenericSkill skill, GenericSkill[] slots)
+        {
+            if (skill == null)
+                return false;
 
-            if (skill == null) return false;
+            // this is fucking retarded but whatever idc
+            slots = slots.Where(x => x != null).ToArray();
 
             int total = slots.Length;
             int index = Array.IndexOf(slots, skill);

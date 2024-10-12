@@ -3,8 +3,10 @@ using System.Collections;
 using System.Linq;
 using R2API.Utils;
 
-namespace RaindropLobotomy.EGO.Bandit {
-    public class FloodingBullets : BaseState {
+namespace RaindropLobotomy.EGO.Bandit
+{
+    public class FloodingBullets : BaseState
+    {
         public string PortalMuzzle = "PortalMuzzle";
         public string BulletMuzzle = "MuzzleShotgun";
         public GameObject PortalPrefab => EGOMagicBullet.PortalPrefab;
@@ -14,7 +16,7 @@ namespace RaindropLobotomy.EGO.Bandit {
         private Animator animator;
         private AimAnimator aimAnimator;
         private MagicBulletPortal portal;
-        private List<GameObject> toDestroy = new();
+        private List<GameObject> toDestroy = [];
         private GameObject pp;
 
         public override void OnEnter()
@@ -41,36 +43,44 @@ namespace RaindropLobotomy.EGO.Bandit {
             base.FixedUpdate();
         }
 
-        public IEnumerator ProcessBullets() {
+        public IEnumerator ProcessBullets()
+        {
             GameObject portalInst = GameObject.Instantiate(PortalPrefab, FindModelChild(PortalMuzzle));
             portal = portalInst.GetComponent<MagicBulletPortal>();
             yield return new WaitForSeconds(0.5f);
 
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 3; i++)
+            {
                 BulletAttack attack = GetBullet();
-                
+
                 List<HurtBox> targets = GetTargets();
 
-                if (targets.Count >= 3) {
+                if (targets.Count >= 3)
+                {
                     targets = targets.GetRange(0, 3);
                 }
 
                 if (targets.Count == 0) continue;
 
-                if (EGOMagicBullet.config.UseVanillaSounds) {
+                if (EGOMagicBullet.config.UseVanillaSounds)
+                {
                     AkSoundEngine.PostEvent(Events.Play_mage_m2_shoot, base.gameObject);
                 }
-                else {
+                else
+                {
                     AkSoundEngine.PostEvent("Play_fruitloop_portal", base.gameObject);
                 }
 
-                foreach (HurtBox box in targets) {
+                foreach (HurtBox box in targets)
+                {
                     Vector3 position = box.transform.position + Vector3.up * 3f;
 
-                    for (int k = 0; k < 50; k++) {
+                    for (int k = 0; k < 50; k++)
+                    {
                         position = (Random.onUnitSphere * 5) + box.transform.position;
 
-                        if (!Physics.SphereCast(position, 2f, (box.transform.position - position).normalized, out RaycastHit _, Vector3.Distance(box.transform.position, position) - 0.5f, LayerIndex.CommonMasks.bullet, QueryTriggerInteraction.Ignore)) {
+                        if (!Physics.SphereCast(position, 2f, (box.transform.position - position).normalized, out RaycastHit _, Vector3.Distance(box.transform.position, position) - 0.5f, LayerIndex.CommonMasks.bullet, QueryTriggerInteraction.Ignore))
+                        {
                             break;
                         }
                     }
@@ -78,7 +88,8 @@ namespace RaindropLobotomy.EGO.Bandit {
                     Vector3 vector = (box.transform.position - position).normalized;
                     Vector3 position2 = new Ray(position, vector).GetPoint(10);
 
-                    if (Physics.Raycast(position, vector, out RaycastHit info, 10f, LayerIndex.world.mask)) {
+                    if (Physics.Raycast(position, vector, out RaycastHit info, 10f, LayerIndex.world.mask))
+                    {
                         position2 = info.point + (-vector * 2f);
                     }
 
@@ -93,15 +104,18 @@ namespace RaindropLobotomy.EGO.Bandit {
 
                 yield return new WaitForSeconds(1f);
 
-                if (isAuthority) {
+                if (isAuthority)
+                {
                     attack.Fire();
                     portal.FireBullet(attack);
                 }
 
-                if (EGOMagicBullet.config.UseVanillaSounds) {
+                if (EGOMagicBullet.config.UseVanillaSounds)
+                {
                     AkSoundEngine.PostEvent(Events.Play_bandit2_m1_rifle, base.gameObject);
                 }
-                else {
+                else
+                {
                     AkSoundEngine.PostEvent("Play_fruitloop_shot", base.gameObject);
                 }
 
@@ -111,7 +125,8 @@ namespace RaindropLobotomy.EGO.Bandit {
 
                 yield return new WaitForSeconds(0.5f);
 
-                for (int j = 0; j < toDestroy.Count; j++) {
+                for (int j = 0; j < toDestroy.Count; j++)
+                {
                     GameObject.Destroy(toDestroy[j]);
                 }
 
@@ -120,11 +135,13 @@ namespace RaindropLobotomy.EGO.Bandit {
 
                 bool allowed = IsAllowedToContinue();
 
-                if (lastAmmo) {
+                if (lastAmmo)
+                {
                     break;
                 }
 
-                if (!allowed) {
+                if (!allowed)
+                {
                     break;
                 }
 
@@ -146,19 +163,22 @@ namespace RaindropLobotomy.EGO.Bandit {
             GameObject.Destroy(portal.gameObject);
             GameObject.Destroy(pp);
 
-            for (int i = 0; i < toDestroy.Count; i++) {
+            for (int i = 0; i < toDestroy.Count; i++)
+            {
                 GameObject.Destroy(toDestroy[i]);
             }
             base.characterBody.RemoveBuff(RoR2Content.Buffs.ElephantArmorBoost);
         }
 
-        public bool IsAllowedToContinue() {
+        public bool IsAllowedToContinue()
+        {
             base.skillLocator.special.DeductStock(1);
 
             return base.skillLocator.special.stock > 0;
         }
 
-        public BulletAttack GetBullet() {
+        public BulletAttack GetBullet()
+        {
             Transform muzzle = FindModelChild(BulletMuzzle);
             float distance = Vector3.Distance(muzzle.position, portal.transform.position);
 
@@ -180,7 +200,8 @@ namespace RaindropLobotomy.EGO.Bandit {
             return attack;
         }
 
-        public List<HurtBox> GetTargets() {
+        public List<HurtBox> GetTargets()
+        {
             SphereSearch search = new();
             search.origin = base.transform.position;
             search.mask = LayerIndex.entityPrecise.mask;
@@ -188,8 +209,8 @@ namespace RaindropLobotomy.EGO.Bandit {
             search.RefreshCandidates();
             search.FilterCandidatesByDistinctHurtBoxEntities();
             search.FilterCandidatesByHurtBoxTeam(TeamMask.GetUnprotectedTeams(GetTeam()));
-            
-            return search.GetHurtBoxes().Where(x => 
+
+            return search.GetHurtBoxes().Where(x =>
                 true
             ).ToList();
         }

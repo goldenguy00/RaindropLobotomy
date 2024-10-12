@@ -29,60 +29,17 @@
       <PackageReference Include="R2API.Dot" Version="1.0.0" />
       <PackageReference Include="R2API.Prefab" Version="1.0.1" />
       <PackageReference Include="R2API.RecalculateStats" Version="1.0.0" />
-      <PackageReference Include="R2API.Director" Version="1.0.0"/>
-      <PackageReference Include="R2API.DamageType" Version="1.0.4"/>
-      <PackageReference Include="R2API.Networking" Version="1.0.0"/>
+      <PackageReference Include="R2API.Director" Version="1.0.0" />
+      <PackageReference Include="R2API.DamageType" Version="1.0.4" />
+      <PackageReference Include="R2API.Networking" Version="1.0.0" />
     </ItemGroup>
   
     <ItemGroup>
-      <Reference Include="Facepunch.Steamworks">
-        <HintPath>libs\Facepunch.Steamworks.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="KdTreeLib">
-        <HintPath>libs\KdTreeLib.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="Mono.Security">
-        <HintPath>libs\Mono.Security.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="pb_Stl">
-        <HintPath>libs\pb_Stl.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="Poly2Tri">
-        <HintPath>libs\Poly2Tri.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="ProBuilderCore">
-        <HintPath>libs\ProBuilderCore.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="ProBuilderMeshOps">
-        <HintPath>libs\ProBuilderMeshOps.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="Rewired_Windows_Lib">
-        <HintPath>libs\Rewired_Windows_Lib.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="SimpleJSON">
-        <HintPath>libs\SimpleJSON.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="Zio">
-        <HintPath>libs\Zio.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="Decalicious">
-        <HintPath>.\libs\Decalicious.dll</HintPath>
+      <Reference Include="PaladinMod">
+        <HintPath>..\..\SharedRef\PaladinMod.dll</HintPath>
       </Reference>
       <Reference Include="Survariants">
-        <HintPath>.\libs\Survariants.dll</HintPath>
-      </Reference>
-      <Reference Include="PaladinMod">
-        <HintPath>.\libs\PaladinMod.dll</HintPath>
+        <HintPath>..\..\SharedRef\Survariants.dll</HintPath>
       </Reference>
     </ItemGroup>
   

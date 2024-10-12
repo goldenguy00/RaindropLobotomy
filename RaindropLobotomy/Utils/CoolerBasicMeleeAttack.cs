@@ -1,7 +1,10 @@
 using System;
 
-namespace RaindropLobotomy.Utils {
-    public abstract class CoolerBasicMeleeAttack : BasicMeleeAttack {
+namespace RaindropLobotomy.Utils
+{
+    public abstract class CoolerBasicMeleeAttack : BasicMeleeAttack
+    {
+        // fucking stupid
         public abstract float BaseDuration { get; }
         public abstract float DamageCoefficient { get; }
         public abstract string HitboxName { get; }
@@ -32,14 +35,17 @@ namespace RaindropLobotomy.Utils {
         {
             base.fixedAge += Time.fixedDeltaTime;
 
-            if (string.IsNullOrEmpty(MechanimHitboxParameter) && AlternateActiveParameter()) {
+            if (string.IsNullOrEmpty(MechanimHitboxParameter) && AlternateActiveParameter())
+            {
                 base.BeginMeleeAttackEffect();
             }
-            else if (animator.GetFloat(MechanimHitboxParameter) >= 0.5f) {
+            else if (animator.GetFloat(MechanimHitboxParameter) >= 0.5f)
+            {
                 base.BeginMeleeAttackEffect();
             }
 
-            if (base.isAuthority) {
+            if (base.isAuthority)
+            {
                 base.AuthorityFixedUpdate();
             }
         }

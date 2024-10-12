@@ -2,8 +2,10 @@ using System;
 using RaindropLobotomy.Buffs;
 using RoR2.Orbs;
 
-namespace RaindropLobotomy.EGO.FalseSon {
-    public class CeaselessJudgement : BaseSkillState {
+namespace RaindropLobotomy.EGO.FalseSon
+{
+    public class CeaselessJudgement : BaseSkillState
+    {
         public float baseDuration = 1.4f;
         public float damageCoeff = 5f;
         public bool hasFired = false;
@@ -13,12 +15,13 @@ namespace RaindropLobotomy.EGO.FalseSon {
 
             baseDuration /= base.attackSpeedStat;
             PlayAnimation("FullBody, Override", "OverheadSwing", "ChargeSwing.playbackRate", baseDuration);
-            
+
             base.StartAimMode(baseDuration * 0.5f);
 
             AkSoundEngine.PostEvent(Events.Play_boss_falseson_skill1_swing, base.gameObject);
 
-            if (NetworkServer.active) {
+            if (NetworkServer.active)
+            {
                 ProcessExecutions();
 
                 DamageInfo damage = new();
@@ -39,23 +42,27 @@ namespace RaindropLobotomy.EGO.FalseSon {
         {
             base.FixedUpdate();
 
-            if (base.fixedAge >= baseDuration * 0.35f && !hasFired) {
+            if (base.fixedAge >= baseDuration * 0.35f && !hasFired)
+            {
                 hasFired = true;
 
                 Vector3 basePos = FindModelChild("ClubExplosionPoint").transform.position;
                 AkSoundEngine.PostEvent(Events.Play_boss_falseson_skill1_swing_impact, base.gameObject);
-                EffectManager.SpawnEffect(Paths.GameObject.FalseSonMeteorGroundImpact, new EffectData {
+                EffectManager.SpawnEffect(Paths.GameObject.FalseSonMeteorGroundImpact, new EffectData
+                {
                     origin = basePos,
                     scale = 0.8f
                 }, false);
             }
 
-            if (base.fixedAge >= baseDuration) {
+            if (base.fixedAge >= baseDuration)
+            {
                 outer.SetNextStateToMain();
             }
         }
 
-        public void ProcessExecutions() {
+        public void ProcessExecutions()
+        {
 
             if (!NetworkServer.active) return;
 
@@ -66,10 +73,11 @@ namespace RaindropLobotomy.EGO.FalseSon {
             search.RefreshCandidates();
             search.FilterCandidatesByHurtBoxTeam(TeamMask.GetUnprotectedTeams(base.GetTeam()));
             search.FilterCandidatesByDistinctHurtBoxEntities();
-            
+
             HurtBox[] boxes = search.GetHurtBoxes();
 
-            for (int i = 0; i < boxes.Length; i++) {
+            for (int i = 0; i < boxes.Length; i++)
+            {
                 HurtBox box = boxes[i];
 
                 LightningStrikeOrb orb = new();
